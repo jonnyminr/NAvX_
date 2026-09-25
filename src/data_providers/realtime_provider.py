@@ -153,7 +153,7 @@ def parse_usnic_csv(raw: bytes) -> Dict[str, Any]:
 class USNICLiveCache:
     def __init__(self, data_root: Path):
         self.data_root = Path(data_root)
-        self.live_dir = self.data_root / "live"
+        self.live_dir = Path(os.getenv("NAVX_LIVE_DIR", "/tmp/navx/live"))
         self.live_dir.mkdir(parents=True, exist_ok=True)
         self.cache_file = self.live_dir / "usnic_current.geojson"
         self.raw_cache_file = self.live_dir / "usnic_current.csv"
@@ -228,7 +228,7 @@ class USNICLiveCache:
                     if d:
                         dates.append(d)
                 stamp = max(dates).strftime("%Y%m%d") if dates else datetime.now(timezone.utc).strftime("%Y%m%d")
-                archive = self.data_root / "raw" / f"usnic_icebergs_{stamp}.csv"
+                archive = self.live_dir / f"usnic_icebergs_{stamp}.csv"
                 archive.parent.mkdir(parents=True, exist_ok=True)
                 if not archive.exists():
                     archive.write_bytes(raw)
@@ -317,7 +317,7 @@ class AISStreamTracker:
         self.cache_file = None
         self._last_cache_write = 0.0
         if self.data_root:
-            live_dir = self.data_root / "live"
+            live_dir = Path(os.getenv("NAVX_LIVE_DIR", "/tmp/navx/live"))
             live_dir.mkdir(parents=True, exist_ok=True)
             self.cache_file = live_dir / "ais_recent.json"
             self._load_cache()

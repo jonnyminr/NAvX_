@@ -12,6 +12,7 @@ import math
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+import os
 from typing import List, Optional
 
 R_EARTH_KM = 6371.0088
@@ -65,7 +66,7 @@ def load_history(data_root: Path, iceberg_id: str) -> List[IcebergObservation]:
     """Load distinct dated positions from archived official CSV snapshots."""
     data_root = Path(data_root)
     files = list((data_root / "raw").glob("usnic_icebergs_*.csv"))
-    live = data_root / "live" / "usnic_current.csv"
+    live = Path(os.getenv("NAVX_LIVE_DIR", "/tmp/navx/live")) / "usnic_current.csv"
     if live.exists():
         files.append(live)
 

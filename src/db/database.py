@@ -10,9 +10,10 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SQLITE = ROOT / "data" / "navx.db"
-DEFAULT_SQLITE.parent.mkdir(parents=True, exist_ok=True)
-
-DATABASE_URL = (os.getenv("DATABASE_URL") or f"sqlite:///{DEFAULT_SQLITE.as_posix()}").strip()
+RUNTIME_SQLITE = Path(os.getenv("NAVX_SQLITE_PATH", "/tmp/navx/navx.db"))
+DATABASE_URL = (os.getenv("DATABASE_URL") or f"sqlite:///{RUNTIME_SQLITE.as_posix()}").strip()
+if DATABASE_URL.startswith("sqlite"):
+    RUNTIME_SQLITE.parent.mkdir(parents=True, exist_ok=True)
 
 
 class Base(DeclarativeBase):

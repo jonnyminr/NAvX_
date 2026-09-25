@@ -72,7 +72,7 @@ ICEBERG_FILE = os.path.join(PROCESSED_DIR, "icebergs.geojson")
 
 ICE_EXTENT_DIR = os.path.join(RAW_DIR, "usnic_extent")
 
-LIVE_DIR = "/tmp/live"
+LIVE_DIR = os.getenv("NAVX_LIVE_DIR", "/tmp/navx/live")
 os.makedirs(LIVE_DIR, exist_ok=True)
 FORECAST_LOG_FILE = os.path.join(LIVE_DIR, "forecast_verification_log.jsonl")
 

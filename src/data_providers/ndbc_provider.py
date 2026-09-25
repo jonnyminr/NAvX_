@@ -28,7 +28,7 @@ def fetch_latest_observations(data_root: Path, min_lat: float | None = None) -> 
         response.raise_for_status()
         text = response.text
 
-    live_dir = Path(data_root) / "live"
+    live_dir = Path(os.getenv("NAVX_LIVE_DIR", "/tmp/navx/live"))
     live_dir.mkdir(parents=True, exist_ok=True)
     raw_path = live_dir / "ndbc_latest_obs.txt"
     raw_path.write_text(text, encoding="utf-8")
