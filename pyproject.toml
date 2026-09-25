@@ -1,2 +1,36 @@
+[project]
+name = "antarctic-navx"
+version = "1.0.0"
+description = "ANTARCTIC NAV-X Navigation API"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+    "websockets>=13.0",
+    "beautifulsoup4",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "xarray>=2024.1",
+    "netcdf4>=1.7",
+    "h5py>=3.11",
+    "rasterio>=1.3",
+    "geopy>=2.4",
+    "shapely>=2.0",
+    "geopandas>=1.0",
+    "pillow>=10.0",
+    "matplotlib>=3.8",
+    "cdsapi>=0.7",
+    "copernicusmarine>=2.0",
+    "pytest>=8.0",
+    "scikit-learn>=1.8,<1.9",
+    "joblib>=1.4",
+    "sqlalchemy>=2.0,<2.1",
+    "psycopg[binary]>=3.2,<4",
+    "alembic>=1.13,<2",
+    "apscheduler>=3.10,<4",
+]
+
 [tool.vercel]
 entrypoint = "src.api.main:app"
