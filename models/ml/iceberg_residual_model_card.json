@@ -1,0 +1,40 @@
+{
+  "status": "TRAINED",
+  "model_version": "NAVX-DRIFT-ML-v1.0",
+  "trained_at": "2026-09-15T07:12:38.676811+00:00",
+  "algorithm": "RandomForestRegressor multi-output residual velocity",
+  "scikit_learn_version": "1.8.0",
+  "training_samples": 32,
+  "feature_names": [
+    "latitude_scaled",
+    "longitude_sin",
+    "longitude_cos",
+    "length_nm_scaled",
+    "width_nm_scaled",
+    "log_area_sqkm_scaled",
+    "ocean_u_ms",
+    "ocean_v_ms",
+    "wind_u_scaled",
+    "wind_v_scaled"
+  ],
+  "official_sources": [
+    "usnic_icebergs_20260901.csv",
+    "usnic_icebergs_20260904.csv"
+  ],
+  "forcing_sources": [
+    "cached CMEMS ocean currents",
+    "cached ECMWF ERA5 10 m wind"
+  ],
+  "target": "observed USNIC drift velocity minus physics baseline velocity",
+  "validation": {
+    "method": "5-fold shuffled held-out cross-validation over official transitions",
+    "physics_endpoint_mae_km": 106.339,
+    "hybrid_endpoint_mae_km": 56.721,
+    "improvement_percent": 46.66,
+    "sample_count": 32,
+    "certified_navigation_accuracy": false
+  },
+  "runtime_enabled": true,
+  "activation_rule": "Only activate when held-out hybrid endpoint MAE beats the physics baseline and >=20 real transitions exist.",
+  "note": "Exploratory SIH research model trained only on archived official USNIC fixes and cached scientific forcing. Small datasets limit generalization; this is not certified navigation accuracy."
+}

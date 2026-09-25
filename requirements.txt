@@ -1,0 +1,37 @@
+# Web API / server
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-dotenv>=1.0
+httpx>=0.27
+websockets>=13.0
+beautifulsoup4
+
+# Scientific data stack
+numpy>=1.26
+pandas>=2.2
+xarray>=2024.1
+netcdf4>=1.7
+h5py>=3.11
+rasterio>=1.3
+geopy>=2.4
+shapely>=2.0
+geopandas>=1.0
+pillow>=10.0
+matplotlib>=3.8
+
+# Optional live scientific-data clients used by ingestion/provider modules
+cdsapi>=0.7
+copernicusmarine>=2.0
+
+# Tests
+pytest>=8.0
+
+# AI / ML decision-support layer
+scikit-learn>=1.8,<1.9
+joblib>=1.4
+
+# Persistent database + automatic ingestion scheduler
+SQLAlchemy>=2.0,<2.1
+psycopg[binary]>=3.2,<4
+alembic>=1.13,<2
+APScheduler>=3.10,<4

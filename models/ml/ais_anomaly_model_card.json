@@ -1,0 +1,19 @@
+{
+  "status": "TRAINED",
+  "model_version": "NAVX-AIS-ML-v1.1",
+  "trained_at": "2026-09-25T13:24:02.601550+00:00",
+  "algorithm": "IsolationForest",
+  "scikit_learn_version": "1.9.0",
+  "training_samples": 46,
+  "unique_vessels": 25,
+  "features": [
+    "sog_knots",
+    "sin_cog",
+    "cos_cog",
+    "sin_heading",
+    "cos_heading",
+    "abs_turn_proxy"
+  ],
+  "training_source": "Persistent real AIS database + genuine AIS CSV cache only",
+  "note": "Unsupervised statistical anomaly detector trained only on genuine received AIS samples. An anomaly is not a danger/intent classification."
+}

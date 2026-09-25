@@ -1,0 +1,10 @@
+ANTARCTIC NAV-X publish-ready verification
+
+- Frontend layout retained from V10 redesign.
+- Local tunneling dependency removed.
+- Render deployment files added: render.yaml and Procfile.
+- Public deployment guide added: PUBLISH_SITE.md.
+- Example AIS credential removed from .env.example.
+- Real-data integrity behavior retained; unavailable live sources are not replaced with fake data.
+- Automated tests: 64 passed.
+- Smoke test: GET / -> 200, GET /api/system/health -> 200.

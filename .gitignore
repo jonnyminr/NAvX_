@@ -1,0 +1,31 @@
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+env/
+credentials.json
+*secret*
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Logs / generated outputs
+*.log
+decision_dashboard_output.png
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+data/live/
+
+# Local NAV-X database fallback
+*.db
+*.sqlite
+*.sqlite3

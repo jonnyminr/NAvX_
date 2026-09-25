@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: antarctic-nav-x
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/system/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTO_INGESTION_ENABLED
+        value: "true"
+      - key: AIS_PROVIDER
+        value: auto
+      - key: AISSTREAM_API_KEY
+        sync: false
+      - key: AISHUB_USERNAME
+        sync: false
+      - key: DATALASTIC_API_KEY
+        sync: false
+      - key: MAPPLS_STATIC_KEY
+        sync: false
+      - key: COPERNICUSMARINE_SERVICE_USERNAME
+        sync: false
+      - key: COPERNICUSMARINE_SERVICE_PASSWORD
+        sync: false
+      - key: CDSAPI_URL
+        value: https://cds.climate.copernicus.eu/api
+      - key: CDSAPI_KEY
+        sync: false
+      - key: SENTINEL_CLIENT_ID
+        sync: false
+      - key: SENTINEL_CLIENT_SECRET
+        sync: false
+      - key: EARTHDATA_TOKEN
+        sync: false

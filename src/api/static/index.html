@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>ANTARCTIC NAV-X | Navigation Decision Support</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.7.0/dist/maplibre-gl.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/maplibre-gl@6.7.0/dist/maplibre-gl.css'">
+<style>
+:root{--bg:#f2f8fc;--panel:#fff;--panel-2:#f7fbfe;--line:#dceaf3;--line-strong:#c4dbe8;--text:#0d2e46;--muted:#67849a;--blue:#0d8ce8;--blue-2:#3fb7f3;--cyan:#e8f7ff;--green:#20a673;--amber:#e8a52b;--red:#e25a5a;--nav:#f8fcff;--shadow:0 12px 36px rgba(28,89,127,.09);--radius:18px;--side:228px}
+:root[data-theme="dark"]{--bg:#06131f;--panel:#0a1b2a;--panel-2:#0d2435;--line:#17384e;--line-strong:#27526b;--text:#ecf8ff;--muted:#86a8bd;--blue:#3fb7f3;--blue-2:#6ed0ff;--cyan:#0b2b3e;--green:#4ad5a1;--amber:#f2bd5a;--red:#ff7a7a;--nav:#071724;--shadow:0 14px 42px rgba(0,0,0,.26)}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}button,input,select{font:inherit;color:inherit}.shell{height:100vh;display:grid;grid-template-columns:var(--side) minmax(0,1fr)}
+.sidebar{background:var(--nav);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;min-height:0}.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;border-bottom:1px solid var(--line)}.brand-mark{width:34px;height:34px;border:2px solid var(--blue);border-radius:50%;display:grid;place-items:center;font-weight:950;color:var(--blue);font-size:.72rem}.brand-name{font-weight:950;letter-spacing:.04em}.brand-sub{font-size:.62rem;color:var(--muted);margin-top:2px}.nav-wrap{overflow:auto;padding:14px 0;scrollbar-width:thin}.nav-label{font-size:.59rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:900;padding:10px 10px 6px}.nav{display:grid;gap:3px}.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;text-decoration:none;color:var(--text);font-size:.76rem;font-weight:720;border:1px solid transparent}.nav a:hover{background:var(--panel)}.nav a.active{background:#e7f5ff;color:#0877c9;border-color:#cfeaff}:root[data-theme="dark"] .nav a.active{background:#0d2d43;color:#75ceff;border-color:#20506d}.nav-icon{width:24px;height:24px;border:1px solid var(--line);border-radius:7px;display:grid;place-items:center;font-size:.57rem;font-weight:900;background:var(--panel)}.sidebar-foot{margin-top:auto;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-size:.64rem;color:var(--muted);line-height:1.5}.sidebar-foot strong{display:block;color:var(--text);margin-bottom:4px}
+.main{min-width:0;height:100vh;display:flex;flex-direction:column}.topbar{height:68px;flex:0 0 68px;background:color-mix(in srgb,var(--panel) 94%,transparent);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:10px 18px;backdrop-filter:blur(14px);z-index:5}.top-title{min-width:220px}.top-title h1{font-size:1.02rem;margin:0}.top-title p{font-size:.67rem;color:var(--muted);margin:3px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}.top-search{flex:1;max-width:560px;display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:0 11px}.top-search input{border:0;outline:0;background:transparent;min-height:38px;width:100%;font-size:.72rem}.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}.clock{font-size:.65rem;color:var(--muted);white-space:nowrap}.live-badge{display:inline-flex;gap:6px;align-items:center;font-size:.64rem;font-weight:900;color:var(--green)}.live-badge:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 14%,transparent)}
+.workspace{position:relative;flex:1;min-height:0;overflow:hidden}.page-view{position:absolute;inset:0;overflow:auto;padding:18px;visibility:hidden;opacity:0;pointer-events:none}.page-view.active{visibility:visible;opacity:1;pointer-events:auto;z-index:2}.page-inner{width:min(100%,1480px);margin:auto;display:grid;gap:16px}.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px}.page-heading h2{margin:0;font-size:1.34rem}.page-heading p{margin:5px 0 0;max-width:820px;color:var(--muted);font-size:.74rem;line-height:1.5}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:16px 17px 0}.card-head h2,.card-head h3{margin:0}.card-head h2{font-size:1.05rem}.card-head h3{font-size:.9rem}.card-head p{font-size:.7rem;color:var(--muted);line-height:1.5;margin:5px 0 0}.card-body{padding:14px 17px 17px}.grid-2{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);gap:16px;align-items:start}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stack{display:grid;gap:16px}.tag{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel-2);font-size:.62rem;color:var(--muted);font-weight:800;white-space:nowrap}.btn{border:0;border-radius:9px;padding:9px 13px;font-size:.72rem;font-weight:850;cursor:pointer;transition:.15s ease}.btn:hover{transform:translateY(-1px)}.btn-primary{background:var(--blue);color:white}.btn-secondary{background:var(--panel-2);border:1px solid var(--line);color:var(--text)}.btn-danger{background:#fff1f1;color:var(--red);border:1px solid #ffd0d0}.btn-small{padding:7px 10px;font-size:.66rem}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);cursor:pointer}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.link-button{border:0;background:transparent;color:var(--blue);font-weight:850;padding:0;cursor:pointer}
+.hero{min-height:310px;display:grid;grid-template-columns:1.04fr .96fr;position:relative;overflow:hidden;background:linear-gradient(112deg,#f9fdff 0%,#eef9ff 58%,#d9f2ff 100%)}:root[data-theme="dark"] .hero{background:linear-gradient(112deg,#0c2232,#0b2b40 58%,#0a3851)}.hero-copy{padding:42px 42px 38px;position:relative;z-index:2}.hero-copy .eyebrow{font-size:.66rem;font-weight:900;color:var(--blue);letter-spacing:.14em;text-transform:uppercase}.hero h2{font-size:2.2rem;line-height:1.08;margin:12px 0 10px;max-width:620px;letter-spacing:-.04em}.hero p{max-width:630px;color:var(--muted);font-size:.82rem;line-height:1.7}.hero-art{position:relative;min-height:300px;overflow:hidden}.hero-art:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,rgba(255,255,255,.92),transparent 22%),linear-gradient(165deg,transparent 0 47%,rgba(72,177,230,.24) 48% 54%,rgba(16,111,170,.32) 55% 100%)}.mountain{position:absolute;right:7%;bottom:22%;width:77%;height:57%;clip-path:polygon(0 100%,19% 55%,29% 75%,48% 19%,62% 59%,72% 43%,100% 100%);background:linear-gradient(145deg,#fff 0 42%,#b9e4f6 43% 60%,#75badc 61%)}.ship{position:absolute;right:16%;bottom:18%;width:115px;height:24px;background:#173c58;border-radius:5px 20px 7px 7px;transform:skewX(-8deg);box-shadow:0 8px 0 -2px #82c9e8}.ship:before{content:"";position:absolute;left:24px;bottom:20px;width:55px;height:26px;background:white;border:4px solid #173c58;border-bottom:0}.ship:after{content:"";position:absolute;left:48px;bottom:46px;width:4px;height:30px;background:#173c58}.feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.feature-card{padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:var(--shadow)}.feature-card .mini-icon{width:36px;height:36px;border-radius:50%;background:var(--cyan);display:grid;place-items:center;color:var(--blue);font-weight:950}.feature-card strong{display:block;margin-top:10px;font-size:.78rem}.feature-card p{margin:5px 0 0;color:var(--muted);font-size:.66rem;line-height:1.45}.home-stat{font-size:1.1rem;font-weight:950;color:var(--blue);margin-top:8px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field{display:grid;gap:5px}.field label{font-size:.66rem;font-weight:850}.field input,.field select,.search-row input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:9px;padding:0 10px;background:var(--panel-2);outline:0;font-size:.72rem}.field input:focus,.field select:focus,.search-row input:focus{border-color:#8dcef5;box-shadow:0 0 0 3px rgba(20,139,229,.08)}.hint{font-size:.63rem;color:var(--muted);line-height:1.45}.gps-box{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px;border:1px solid #cfeaff;background:#f3fbff;border-radius:12px;margin-bottom:12px}:root[data-theme="dark"] .gps-box{background:#0c2d42;border-color:#20506d}.gps-title{font-size:.76rem;font-weight:900}.gps-meta{font-size:.67rem;color:var(--muted);margin-top:4px;line-height:1.45}.gps-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px}.gps-error{display:none;margin-top:7px;padding:8px;border-radius:8px;background:#fff1f1;color:var(--red);font-size:.65rem}.gps-error.show{display:block}.location-box{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);margin-top:5px}.location-name{font-size:.73rem;font-weight:900}.location-meta{font-size:.62rem;color:var(--muted);line-height:1.45;margin-top:4px}.location-actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.warning-box,.analysis-status,.graph-state{padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:.66rem;color:var(--muted);line-height:1.45;margin-top:10px}.analysis-status.busy{color:var(--blue)}.analysis-status.error{color:var(--red)}.analysis-status.ok{color:var(--green)}
+.route-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.route-card{padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);cursor:pointer}.route-card.active{border-color:#7fc8f2;box-shadow:inset 0 0 0 1px #b5e1fa}.route-card.recommended{background:#f2fff9;border-color:#b9ead8}.route-card.unavailable{opacity:.62;cursor:default}.route-name{font-size:.72rem;font-weight:950}.route-meta{display:grid;gap:3px;margin-top:7px;font-size:.62rem;color:var(--muted)}.route-meta strong{color:var(--text)}.explain{margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}.explain-title{font-size:.72rem;font-weight:950}.explain ul{margin:7px 0 0;padding-left:17px;font-size:.64rem;color:var(--muted);line-height:1.55}.summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.summary{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}.summary .k{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.summary .v{font-size:.88rem;font-weight:950;margin-top:4px}.summary .s{font-size:.58rem;color:var(--muted);margin-top:3px}.provenance-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.provenance-item{padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}.provenance-item strong{font-size:.64rem}.provenance-item span{display:block;font-size:.58rem;color:var(--muted);margin-top:3px;line-height:1.35}.nearby-list{display:grid;gap:7px}.nearby-item{padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);font-size:.64rem}.empty{padding:16px;border:1px dashed var(--line-strong);border-radius:10px;color:var(--muted);font-size:.68rem;text-align:center}
+.status-line,.layer-toggles,.map-toolbar,.map-toolbar-left,.map-toolbar-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}.status-dot.ok{background:var(--green)}.status-dot.bad{background:var(--red)}.status-dot.warn{background:var(--amber)}.map-toolbar{justify-content:space-between;margin:10px 0}.layer-toggle{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);font-size:.6rem;color:var(--muted)}.layer-toggle input{accent-color:var(--blue)}.map-stage{position:relative;height:min(70vh,720px);min-height:520px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#dfeef6}.map-card .card-body{padding-top:10px}#navxMap{position:absolute;inset:0}.map-loading{position:absolute;inset:0;background:rgba(244,250,254,.92);display:grid;place-items:center;z-index:20}:root[data-theme="dark"] .map-loading{background:rgba(7,24,36,.92)}.map-loading.hidden{display:none}.map-loading-inner{text-align:center;max-width:440px;padding:26px}.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:spin .8s linear infinite;margin:0 auto 10px}@keyframes spin{to{transform:rotate(360deg)}}.map-overlay{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.map-note,.map-info{padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.9);border:1px solid rgba(190,220,236,.95);font-size:.62rem;color:#284b61;box-shadow:0 5px 16px rgba(27,82,111,.12)}.time-panel{display:grid;grid-template-columns:auto minmax(320px,1fr) minmax(250px,.65fr);gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);font-size:.64rem}.time-slider-wrap input{width:100%;accent-color:var(--blue)}.time-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:.56rem}.time-insight{color:var(--muted);line-height:1.4}.marker-ice,.marker-vessel,.marker-point,.marker-destination,.marker-forecast,.marker-forecast-node,.gps-marker,.marker-route-label{display:grid;place-items:center;border-radius:50%;border:2px solid white;box-shadow:0 4px 14px rgba(0,0,0,.22);cursor:pointer}.marker-ice{width:19px;height:19px;background:#f55d5d;color:white;font-size:9px}.marker-vessel{width:20px;height:20px;background:#137cc1;color:white;font-size:9px}.marker-point{width:14px;height:14px;background:#54b5df}.marker-destination{width:18px;height:18px;background:#ff9d2d}.marker-forecast{width:16px;height:16px;background:#f2b53f}.marker-forecast-node{width:8px;height:8px;background:#e8a52b;border-width:1px}.gps-marker{width:18px;height:18px;background:#168be6;box-shadow:0 0 0 7px rgba(22,139,230,.18)}.marker-route-label{width:auto;height:auto;border-radius:7px;padding:4px 6px;background:white;color:#14374f;font-size:9px;font-weight:900}.marker-checkpoint{background:white;border:1px solid #2c9ddd;border-radius:8px;padding:4px 6px;color:#0d4569;box-shadow:0 4px 14px rgba(0,0,0,.18);white-space:nowrap}.marker-checkpoint b{display:block;font-size:9px}.marker-checkpoint small{font-size:8px}.maplibregl-popup-content{font-family:inherit!important;border-radius:10px!important;padding:10px 12px!important}.popup-title{font-size:.72rem;font-weight:900;color:#0d2e46}.popup-meta{font-size:.62rem;color:#547084;line-height:1.45;margin-top:4px}
+.search-row{display:flex;gap:8px;margin-bottom:10px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;font-size:.64rem}th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:.57rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--panel-2);position:sticky;top:0;z-index:1}tr:last-child td{border-bottom:0}.selected-row{background:#eff9ff}.data-banner{display:flex;gap:12px;align-items:center;padding:12px 14px;border:1px solid #cfeaff;background:#f3fbff;border-radius:13px}.data-banner>div:first-child{font-weight:950;color:var(--blue)}.data-banner strong{font-size:.68rem}.data-banner span{display:block;font-size:.62rem;color:var(--muted);margin-top:3px}.graph-card:fullscreen{background:var(--bg);padding:24px}.graph-wrap{height:420px;min-width:0}.graph-wrap canvas{width:100%;height:100%}.graph-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:.62rem;color:var(--muted)}.legend-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.risk-low{color:var(--green)}.risk-moderate{color:var(--amber)}.risk-high,.risk-critical{color:var(--red)}
+.metric-card{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}.metric-card span{font-size:.62rem;color:var(--muted)}.metric-card strong{display:block;margin-top:6px;font-size:.9rem}.forecast-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.forecast-values{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.forecast-value{padding:13px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}.forecast-value span{font-size:.59rem;color:var(--muted)}.forecast-value strong{display:block;margin-top:5px;font-size:.83rem}.evidence-box{padding:13px;border-radius:12px;background:linear-gradient(135deg,#eef9ff,#f9fdff);border:1px solid #cfeaff;font-size:.67rem;color:var(--muted);line-height:1.5}:root[data-theme="dark"] .evidence-box{background:#0c2d42;border-color:#20506d}
+.risk-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px}.risk-gauge-wrap{display:grid;place-items:center;gap:10px;min-height:260px}.risk-gauge{--score:0;width:190px;height:190px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--amber) calc(var(--score)*1%),#e8f0f5 0);position:relative}.risk-gauge:after{content:"";position:absolute;width:142px;height:142px;background:var(--panel);border-radius:50%}.risk-gauge strong{position:relative;z-index:2;font-size:2.1rem}.risk-gauge small{position:absolute;z-index:2;margin-top:52px;color:var(--muted);font-size:.64rem}.hazard-list{display:grid;gap:8px}.hazard-row{display:flex;justify-content:space-between;gap:16px;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:.66rem}.hazard-row span{display:block;color:var(--muted);font-size:.58rem;margin-top:3px}.state-pill{display:inline-flex;padding:4px 7px;border-radius:999px;font-size:.55rem;font-weight:900;border:1px solid}.state-ok{color:var(--green);background:#effcf7;border-color:#c8efdf}.state-bad{color:var(--red);background:#fff3f3;border-color:#ffd3d3}.alert-card{display:grid;grid-template-columns:34px 1fr;gap:11px;padding:12px;border:1px solid var(--line);border-radius:11px;background:var(--panel)}.alert-icon{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:950}.alert-card.critical .alert-icon{background:#fff0f0;color:var(--red)}.alert-card.warning .alert-icon{background:#fff8e8;color:var(--amber)}.alert-card.info .alert-icon{background:#edf8ff;color:var(--blue)}.alert-card strong{font-size:.72rem}.alert-card p{margin:4px 0;color:var(--muted);font-size:.64rem;line-height:1.4}.alert-card span{font-size:.57rem;color:var(--muted)}.alerts-list{display:grid;gap:9px}.history-point{display:grid;grid-template-columns:100px 1fr auto;gap:10px;padding:9px;border-bottom:1px solid var(--line);font-size:.62rem}.history-point small{color:var(--muted)}.replay-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.75fr);gap:14px}.replay-canvas{height:520px}.replay-canvas canvas{width:100%;height:100%}.settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.setting-row{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.setting-row:last-child{border-bottom:0}.setting-row strong{font-size:.72rem}.setting-row span{display:block;color:var(--muted);font-size:.61rem;margin-top:3px}.switch{position:relative;width:42px;height:24px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:999px;background:#c9d9e3;cursor:pointer}.slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:white;transition:.18s}.switch input:checked+.slider{background:var(--blue)}.switch input:checked+.slider:before{transform:translateX(18px)}
+@media(max-width:1180px){:root{--side:205px}.grid-2,.forecast-hero,.risk-layout,.replay-grid{grid-template-columns:1fr}.feature-grid,.grid-4,.forecast-values{grid-template-columns:repeat(2,minmax(0,1fr))}.provenance-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{grid-template-columns:1fr}.hero-art{min-height:220px}.top-title p{max-width:300px}}
+@media(max-width:820px){body{overflow:auto}.shell{display:block;height:auto;min-height:100vh}.sidebar{position:relative;height:auto}.nav-wrap{max-height:260px}.main{height:auto;min-height:100vh}.workspace{min-height:900px}.topbar{position:sticky;top:0}.top-search{display:none}.page-view{position:absolute}.grid-3,.feature-grid,.grid-4,.forecast-values,.form-grid,.route-cards,.summary-grid,.settings-grid{grid-template-columns:1fr}.time-panel{grid-template-columns:1fr}.provenance-grid{grid-template-columns:1fr}.hero-copy{padding:28px}.hero h2{font-size:1.7rem}.map-stage{min-height:540px}.clock{display:none}}
+
+.ai-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.ai-stat{padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}.ai-stat .k{font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:900}.ai-stat .v{font-size:1.05rem;font-weight:950;margin-top:7px}.ai-stat .s{font-size:.61rem;color:var(--muted);line-height:1.45;margin-top:5px}.ai-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}.model-evidence{display:grid;gap:9px}.model-row{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:.66rem}.model-row strong{font-size:.64rem}.model-row span{color:var(--muted);line-height:1.45}.decision-hero{border:1px solid #b9dff5;background:linear-gradient(120deg,var(--panel),color-mix(in srgb,var(--cyan) 65%,var(--panel)))}.decision-profile{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.decision-profile .route-name{font-size:1.5rem;font-weight:950;letter-spacing:-.02em}.decision-badge{display:inline-flex;padding:6px 10px;border-radius:999px;background:var(--cyan);border:1px solid #b8dff5;color:var(--blue);font-size:.62rem;font-weight:950;letter-spacing:.06em}.decision-summary{font-size:.75rem;color:var(--muted);line-height:1.6;margin-top:8px}.decision-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:14px 0}.decision-metric{padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--panel)}.decision-metric .k{font-size:.57rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:900}.decision-metric .v{font-size:.88rem;font-weight:950;margin-top:5px}.decision-evidence{display:grid;grid-template-columns:1fr 1fr;gap:12px}.decision-panel{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}.decision-panel h4{margin:0 0 8px;font-size:.69rem}.decision-list{margin:0;padding-left:18px;color:var(--muted);font-size:.66rem;line-height:1.55}.decision-list li+li{margin-top:5px}.pipeline-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.pipeline-step{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}.pipeline-step strong{display:block;font-size:.7rem}.pipeline-step span{display:block;font-size:.61rem;color:var(--muted);line-height:1.45;margin-top:5px}.anomaly-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);margin-bottom:10px}.anomaly-summary strong{font-size:.72rem}.anomaly-summary span{font-size:.62rem;color:var(--muted)}.ml-active{color:var(--green)}.ml-hold{color:var(--amber)}@media(max-width:1180px){.ai-layout{grid-template-columns:1fr}.pipeline-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.decision-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:820px){.ai-grid,.decision-metrics,.decision-evidence,.pipeline-steps{grid-template-columns:1fr}.model-row{grid-template-columns:1fr}.anomaly-summary{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">NX</div><div><div class="brand-name">NAV-X</div><div class="brand-sub">Safer routes. Smarter decisions.</div></div></div>
+    <div class="nav-wrap">
+      <div class="nav-label">Operations</div>
+      <nav class="nav">
+        <a href="#homeSection" data-view="homeSection" onclick="activateNav(this,'homeSection');return false"><span class="nav-icon">H</span>Home</a>
+        <a href="#mapSection" data-view="mapSection" onclick="activateNav(this,'mapSection');return false"><span class="nav-icon">LM</span>Live Map</a>
+        <a href="#forecastSection" data-view="forecastSection" onclick="activateNav(this,'forecastSection');return false"><span class="nav-icon">FC</span>Forecast</a>
+        <a href="#plannerSection" data-view="plannerSection" onclick="activateNav(this,'plannerSection');return false"><span class="nav-icon">VP</span>Voyage Planner</a>
+        <a href="#graphSection" data-view="graphSection" onclick="activateNav(this,'graphSection');return false"><span class="nav-icon">RD</span>Route Details</a>
+        <a href="#riskDashboard" data-view="riskDashboard" onclick="activateNav(this,'riskDashboard');return false"><span class="nav-icon">RK</span>Risk Dashboard</a>
+        <a href="#dataObservatory" data-view="dataObservatory" onclick="activateNav(this,'dataObservatory');return false"><span class="nav-icon">DO</span>Data Observatory</a>
+        <a href="#riskDetails" data-view="riskDetails" onclick="activateNav(this,'riskDetails');return false"><span class="nav-icon">ID</span>Risk / Iceberg Details</a>
+        <a href="#alertsSection" data-view="alertsSection" onclick="activateNav(this,'alertsSection');return false"><span class="nav-icon">AL</span>Alerts <span class="tag" id="alertCount">0</span></a>
+      </nav>
+      <div class="nav-label">AI & Analysis</div>
+      <nav class="nav">
+        <a href="#aiSection" data-view="aiSection" onclick="activateNav(this,'aiSection');return false"><span class="nav-icon">AI</span>AI Decision Center</a>
+        <a href="#scenarioSection" data-view="scenarioSection" onclick="activateNav(this,'scenarioSection');return false"><span class="nav-icon">SC</span>Scenario Simulator</a>
+        <a href="#historicalSection" data-view="historicalSection" onclick="activateNav(this,'historicalSection');return false"><span class="nav-icon">HR</span>Historical Replay</a>
+        <a href="#icebergCatalog" data-view="icebergCatalog" onclick="activateNav(this,'icebergCatalog');return false"><span class="nav-icon">IC</span>Iceberg Catalog</a>
+        <a href="#vesselCatalog" data-view="vesselCatalog" onclick="activateNav(this,'vesselCatalog');return false"><span class="nav-icon">AIS</span>AIS Vessel Catalog</a>
+        <a href="#settingsSection" data-view="settingsSection" onclick="activateNav(this,'settingsSection');return false"><span class="nav-icon">ST</span>Profile & Settings</a>
+      </nav>
+    </div>
+    <div class="sidebar-foot"><strong>Real-data integrity mode</strong>Official/cached scientific data is shown with provenance. Missing feeds remain DATA UNAVAILABLE. No simulated AIS or iceberg observations.</div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="top-title"><h1 id="pageTitle">Home</h1><p id="pageSubtitle">Real-data Antarctic navigation decision support.</p></div>
+      <div class="top-search"><span style="color:var(--muted);font-size:.72rem">Search</span><input id="globalSearch" placeholder="Search page, iceberg, vessel…"><button class="btn btn-secondary btn-small" onclick="globalSearch()">Go</button></div>
+      <div class="top-actions"><span class="live-badge">Live</span><span class="clock" id="utcClock">-- UTC</span><button class="btn btn-secondary btn-small" onclick="refreshData()">Refresh</button><button class="icon-btn" id="themeToggle" onclick="toggleTheme()"><span id="themeIcon">☾</span></button></div>
+    </header>
+    <div class="workspace">
+      <section class="page-view" id="homeSection"><div class="page-inner">
+        <article class="card hero"><div class="hero-copy"><div class="eyebrow">Antarctic Navigation Decision Support</div><h2>Navigate the Antarctic with Confidence</h2><p>Real observations, verified scientific forcing, physics-informed iceberg forecasts, AIS when received, and ocean-surface-validated routes—without inventing missing data.</p><div class="actions"><button class="btn btn-primary" onclick="navigateTo('mapSection')">Explore Live Map</button><button class="btn btn-secondary" onclick="navigateTo('plannerSection')">Plan a Voyage</button></div><div class="hint" id="homeDataMode" style="margin-top:16px">Checking scientific provenance…</div></div><div class="hero-art"><div class="mountain"></div><div class="ship"></div></div></article>
+        <div class="feature-grid"><article class="feature-card"><div class="mini-icon">D</div><strong>Live Data Integration</strong><p>Official iceberg data, scientific forcing and received AIS only.</p><div class="home-stat" id="homeDatasetStatus">checking…</div></article><article class="feature-card"><div class="mini-icon">F</div><strong>Iceberg Intelligence</strong><p>Unified real iceberg catalogue with official current observations, supplemental current positions and published historical tracks.</p><div class="home-stat" id="homeIcebergCount">--</div></article><article class="feature-card"><div class="mini-icon">R</div><strong>Risk Analysis</strong><p>CPA, effective clearance, sea ice and spatiotemporal hazards.</p><div class="home-stat" id="homeSurfaceStatus">--</div></article><article class="feature-card"><div class="mini-icon">A</div><strong>AIS Vessel Awareness</strong><p>No synthetic ships. The count reflects positions actually received.</p><div class="home-stat" id="homeAisCount">--</div></article></div>
+      </div></section>
+
+      <section class="page-view" id="mapSection"><div class="page-inner"><article class="card map-card"><div class="card-head"><div><h2>Live Antarctic Map</h2><p>Official observations, received AIS, verified environmental layers and backend-generated route geometry.</p></div><div class="status-line"><span class="status-dot" id="mapStatusDot"></span><span class="tag" id="mapProviderTag">Map: checking…</span><span class="tag" id="mapGpsText">GPS idle</span></div></div><div class="card-body"><div class="time-panel"><strong>Iceberg forecast time</strong><div class="time-slider-wrap"><input id="timeSlider" type="range" min="0" max="5" step="1" value="0" oninput="updateTimeHorizon()"><div class="time-labels"><span>NOW</span><span>+6h</span><span>+12h</span><span>+24h</span><span>+48h</span><span>+72h</span></div></div><div class="time-insight" id="timeInsight">Observed positions are USNIC. Future positions are model forecasts.</div></div><div class="map-toolbar"><div class="map-toolbar-left"><button class="btn btn-secondary btn-small" id="pickStartMapBtn" onclick="beginMapPick('origin')">Pick Start</button><button class="btn btn-secondary btn-small" id="pickDestMapBtn" onclick="beginMapPick('destination')">Pick Destination</button><span class="tag" id="mapRouteTag">Route: --</span><span class="tag" id="mapClickTag">Selection mode: none</span></div><div class="map-toolbar-right"><button class="btn btn-secondary btn-small" onclick="fitAllRoutes()">Fit Routes</button><button class="btn btn-secondary btn-small" id="followGpsBtn" onclick="toggleFollowGps()">Follow GPS: Off</button><button class="btn btn-secondary btn-small" onclick="resetAntarcticView()">Antarctic View</button></div></div><div class="layer-toggles" style="margin-bottom:10px"><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('icebergs',this.checked)">Icebergs</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('forecast',this.checked)">Iceberg Forecast</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('vessels',this.checked)">Vessels</label><label class="layer-toggle"><input type="checkbox" onchange="toggleLayer('currents',this.checked)">Ocean Currents</label><label class="layer-toggle"><input type="checkbox" onchange="toggleLayer('wind',this.checked)">Wind</label><label class="layer-toggle"><input type="checkbox" onchange="toggleLayer('seaice',this.checked)">Sea Ice</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('routes',this.checked)">Routes</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('hazards',this.checked)">Hazards</label></div><div class="map-stage"><div id="navxMap"></div><div class="map-loading" id="mapLoading"><div class="map-loading-inner"><div class="spinner"></div><strong id="mapLoadingTitle">Initializing real interactive map</strong><div class="hint" id="mapLoadingText" style="margin-top:8px">Checking basemap connectivity and MapLibre initialization.</div><button class="btn btn-secondary btn-small" id="mapRetryBtn" style="display:none;margin:14px auto 0" onclick="retryMap()">Retry Map</button></div></div><div class="map-overlay"><div class="map-note" id="mapInstruction">Use Pick Start or Pick Destination, then click a validated ocean cell.</div><div class="map-info" id="mapStatusText">Map initialization pending</div></div></div></div></article></div></section>
+
+      <section class="page-view" id="forecastSection"><div class="page-inner"><div class="page-heading"><div><h2>Environmental Forecast</h2><p>Samples real online model guidance when available, with verified cached CMEMS/ERA5 fallback. Future iceberg positions are clearly labelled model forecasts.</p></div><span class="tag">Decision support · not navigation grade</span></div><div class="forecast-hero"><article class="card"><div class="card-head"><div><h3>Environmental sample</h3><p>Choose a validated Antarctic coordinate. No wave values are invented when a verified wave field is absent.</p></div></div><div class="card-body"><div class="form-grid"><div class="field"><label>Latitude</label><input id="forecastLat" type="number" step="0.0001" value="-60"></div><div class="field"><label>Longitude</label><input id="forecastLon" type="number" step="0.0001" value="-50"></div></div><div class="actions"><button class="btn btn-primary" onclick="sampleEnvironmentalForecast()">Load Real Forcing</button><button class="btn btn-secondary btn-small" onclick="presetForecastPoint('origin')">Use Start</button><button class="btn btn-secondary btn-small" onclick="presetForecastPoint('destination')">Use Destination</button><button class="btn btn-secondary btn-small" onclick="presetForecastPoint('map')">Use Map Center</button></div><div class="forecast-values" style="margin-top:12px"><div class="forecast-value"><span>Ocean current</span><strong id="envCurrent">--</strong></div><div class="forecast-value"><span>10 m wind</span><strong id="envWind">--</strong></div><div class="forecast-value"><span>Sea ice</span><strong id="envSeaIce">--</strong></div><div class="forecast-value"><span>Waves</span><strong id="envWaves">DATA UNAVAILABLE</strong></div></div></div></article><article class="card"><div class="card-head"><div><h3>Source & mode</h3><p>Fresh provider guidance is preferred; cached scientific files remain explicitly identified.</p></div><span class="tag" id="envMode">NOT LOADED</span></div><div class="card-body"><div class="evidence-box" id="forecastEvidence">Load a coordinate to view the exact source and fallback mode.</div></div></article></div><article class="card"><div class="card-head"><div><h3>Iceberg trajectory forecast</h3><p>Official USNIC observation is the starting fix. Future coordinates are physics-informed model outputs, not observations.</p></div><select id="forecastIcebergSelect" onchange="loadSelectedIcebergDetails('forecast')"><option value="">Select official iceberg…</option></select></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Horizon</th><th>Forecast UTC</th><th>Position</th><th>Drift speed</th><th>Bearing</th><th>Uncertainty</th></tr></thead><tbody id="forecastIcebergTable"><tr><td colspan="6">Select an official iceberg.</td></tr></tbody></table></div></div></article></div></section>
+
+      <section class="page-view" id="plannerSection"><div class="page-inner"><div class="page-heading"><div><h2>Plan Your Voyage</h2><p>Select authoritative references, received AIS, GPS, or backend-validated ocean cells. Land/no-data endpoints are rejected.</p></div><span class="tag">FASTEST · BALANCED · SAFEST AVAILABLE</span></div><div class="grid-2"><div class="stack"><article class="card"><div class="card-head"><div><h2>Start, destination & vessel</h2><p>Station coordinates can be reference-only. Marine route endpoints must pass RealOceanSurface validation.</p></div></div><div class="card-body"><div class="gps-box"><div><div class="gps-title">GPS status</div><div class="gps-meta" id="gpsSummary">GPS is idle. Use GPS for one fix, or explicitly start live tracking.</div><div class="gps-error" id="gpsError"></div></div><div class="gps-actions"><button class="btn btn-secondary btn-small" onclick="useGpsOnce()">Use GPS</button><button class="btn btn-secondary btn-small" onclick="startGpsTracking()">Start Live GPS</button><button class="btn btn-danger btn-small" onclick="stopGpsTracking()">Stop GPS</button><button class="btn btn-secondary btn-small" onclick="confirmGpsAsOrigin()">Use as Start</button></div></div><div class="form-grid"><div class="field"><label>Start location</label><select id="startPreset"></select><div class="location-box" id="startLocationInfo"><div class="location-name">Select a start location</div></div><div class="location-actions"><button class="btn btn-secondary btn-small" onclick="beginMapPick('origin')">Pick Start on Map</button></div></div><div class="field"><label>Destination</label><select id="destinationPreset"></select><div class="location-box" id="destinationLocationInfo"><div class="location-name">Select a destination</div></div><div class="location-actions"><button class="btn btn-secondary btn-small" onclick="beginMapPick('destination')">Pick Destination on Map</button></div></div><div class="field"><label>AIS vessel (optional)</label><select id="vesselSelect"><option value="">No AIS vessel selected</option></select><div class="location-actions"><button class="btn btn-secondary btn-small" onclick="useSelectedVesselAsOrigin()">Use Vessel as Start</button></div></div><div class="field"><label>Vessel type</label><select id="vesselType"><option>Cargo Ship</option><option>Research Vessel</option><option>Icebreaker</option><option>Passenger Vessel</option><option>Tanker</option><option>Other</option></select></div><div class="field"><label>Vessel speed (km/h)</label><input id="shipSpeed" type="number" step="0.1" min="1" max="70" value="20"></div><div class="field"><label>Departure</label><input id="departureTime" type="datetime-local"></div><div class="field"><label>Nearby iceberg radius (km)</label><input id="searchRadius" type="number" min="100" max="1500" step="50" value="600"></div><div class="field"><label>Safety buffer (km)</label><input id="safetyBuffer" type="number" min="5" max="150" step="1" value="30"></div></div><details style="margin-top:12px"><summary class="hint" style="cursor:pointer">Manual coordinates — backup only</summary><div class="form-grid" style="margin-top:9px"><div class="field"><label>Start latitude</label><input id="originLat" type="number" step="0.000001"></div><div class="field"><label>Start longitude</label><input id="originLon" type="number" step="0.000001"></div><div class="field"><label>Destination latitude</label><input id="destinationLat" type="number" step="0.000001"></div><div class="field"><label>Destination longitude</label><input id="destinationLon" type="number" step="0.000001"></div></div><div class="actions"><button class="btn btn-secondary btn-small" onclick="setManualPoint('origin')">Use manual Start</button><button class="btn btn-secondary btn-small" onclick="setManualPoint('destination')">Use manual Destination</button></div></details><div class="actions"><button class="btn btn-primary" onclick="computeRoutes()">Generate Verified Routes</button><button class="btn btn-danger" onclick="clearRoute()">Clear Route</button></div><div class="analysis-status" id="analysisStatus">READY — choose validated start and destination points.</div><div class="warning-box" id="areaWarning">ANTARCTIC NAV-X is decision support, not an ECDIS replacement or certified navigation system.</div></div></article><article class="card"><div class="card-head"><div><h3>Route Options</h3><p>Unavailable profiles stay explicitly unavailable; no straight-line fallback through land is drawn.</p></div><span class="tag" id="selectedProfileTag">No route</span></div><div class="card-body"><div class="route-cards" id="routeCards"><div class="route-card"><div class="route-name">Route A · Fastest</div><div class="route-meta">Awaiting analysis</div></div><div class="route-card"><div class="route-name">Route B · Balanced</div><div class="route-meta">Awaiting analysis</div></div><div class="route-card"><div class="route-name">Route C · Safest Available</div><div class="route-meta">Awaiting analysis</div></div></div><div class="explain"><div class="explain-title" id="routeDecisionTitle">WHY THIS ROUTE?</div><div id="routeDecisionText" class="hint" style="margin-top:6px">Analyze routes to see backend evidence.</div><ul id="explainList"><li>No route has been analyzed yet.</li></ul></div></div></article></div><div class="stack"><article class="card"><div class="card-head"><div><h3>Selected route</h3><p>Values come directly from the route/hazard backend.</p></div></div><div class="card-body"><div class="summary-grid"><div class="summary"><div class="k">Distance</div><div class="v" id="distanceValue">--</div><div class="s">Backend geometry</div></div><div class="summary"><div class="k">Transit time</div><div class="v" id="etaValue">--</div><div class="s">Distance / operator speed</div></div><div class="summary"><div class="k">Initial direction</div><div class="v" id="bearingValue">--</div><div class="s">Backend bearing</div></div><div class="summary"><div class="k">Risk</div><div class="v" id="riskValue">--</div><div class="s">Spatiotemporal engine</div></div><div class="summary"><div class="k">Iceberg clearance</div><div class="v" id="clearanceValue">--</div><div class="s">Includes forecast uncertainty</div></div><div class="summary"><div class="k">Minimum CPA</div><div class="v" id="cpaValue">--</div><div class="s">When verified forecast exists</div></div><div class="summary"><div class="k">TCA</div><div class="v" id="tcaValue">--</div><div class="s">UTC</div></div><div class="summary"><div class="k">Hazards</div><div class="v" id="hazardValue">--</div><div class="s">Backend encounters</div></div><div class="summary"><div class="k">Sea ice max</div><div class="v" id="seaIceValue">--</div><div class="s">NSIDC concentration</div></div><div class="summary"><div class="k">Arrival UTC</div><div class="v" id="arrivalValue">--</div><div class="s">Departure + ETA</div></div></div><div class="actions"><button class="btn btn-secondary" onclick="navigateTo('mapSection')">View on Map</button><button class="btn btn-secondary" onclick="navigateTo('graphSection')">Route Details</button></div></div></article><article class="card"><div class="card-head"><div><h3>Nearby official icebergs</h3><p>USNIC observations near the selected route start.</p></div><span class="tag" id="nearbyCountTag">0</span></div><div class="card-body"><div class="nearby-list" id="nearbyList"><div class="empty">Set a valid Antarctic start.</div></div></div></article><article class="card"><div class="card-head"><div><h3>Scientific provenance</h3><p>Observed data and model output remain explicitly separated.</p></div></div><div class="card-body"><div class="provenance-grid"><div class="provenance-item"><strong>Icebergs</strong><span id="provUsnic">USNIC · REAL OBSERVATION</span></div><div class="provenance-item"><strong>Ocean</strong><span id="provCmems">CMEMS · loading…</span></div><div class="provenance-item"><strong>Sea ice</strong><span id="provNsidc">NSIDC · loading…</span></div><div class="provenance-item"><strong>Wind</strong><span id="provEra5">ERA5/ECMWF · loading…</span></div><div class="provenance-item"><strong>Vessels</strong><span id="provAis">AIS · received positions only</span></div></div></div></article></div></div></div></section>
+
+      <section class="page-view" id="graphSection"><div class="page-inner"><div class="page-heading"><div><h2>Route Details</h2><p>Direct comparison of the verified FASTEST, BALANCED and SAFEST AVAILABLE profiles.</p></div><button class="btn btn-secondary btn-small" onclick="navigateTo('plannerSection')">Back to Voyage Planner</button></div><article class="card"><div class="card-head"><div><h3>Route Comparison</h3><p>Metrics are not filled with zero when unavailable.</p></div></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Route</th><th>Distance</th><th>ETA</th><th>Risk</th><th>Min clearance</th><th>Min CPA</th><th>Sea ice max</th><th>Arrival</th></tr></thead><tbody id="routeComparisonBody"><tr><td colspan="8">NO VERIFIED ROUTE DATA AVAILABLE</td></tr></tbody></table></div></div></article><article class="card graph-card"><div class="card-head"><div><h3>Route Metric Graph</h3><p>Backend route metrics only.</p></div><button class="btn btn-secondary btn-small" onclick="expandGraph('routeGraph')">Expand Graph</button></div><div class="card-body"><div class="graph-state" id="routeGraphState">NO VERIFIED ROUTE DATA AVAILABLE</div><div class="graph-wrap"><canvas id="routeGraph"></canvas></div><div class="graph-legend"><span><i class="legend-dot" style="background:#147fa8"></i>Route A · Fastest</span><span><i class="legend-dot" style="background:#158a67"></i>Route B · Balanced</span><span><i class="legend-dot" style="background:#6458c9"></i>Route C · Safest Available</span></div></div></article><article class="card graph-card"><div class="card-head"><div><h3>Antarctic Sea-Ice Extent Trend</h3><p>Official USNIC daily records; missing dates are not interpolated.</p></div><button class="btn btn-secondary btn-small" onclick="expandGraph('iceExtentGraph')">Expand Graph</button></div><div class="card-body"><div class="graph-state" id="iceExtentGraphState">LOADING OFFICIAL USNIC SEA-ICE EXTENT…</div><div class="graph-wrap"><canvas id="iceExtentGraph"></canvas></div></div></article></div></section>
+
+      <section class="page-view" id="riskDashboard"><div class="page-inner"><div class="page-heading"><div><h2>Risk Overview</h2><p>Risk values are tied to the selected backend route and current scientific inputs.</p></div><button class="btn btn-secondary btn-small" onclick="navigateTo('plannerSection')">Open Voyage Planner</button></div><div class="risk-layout"><article class="card"><div class="card-head"><div><h3>Overall Risk Score</h3></div></div><div class="card-body"><div class="risk-gauge-wrap"><div class="risk-gauge" id="riskGauge"><strong id="riskGaugeValue">--</strong><small>/100</small></div><strong id="riskLevelText">NO VERIFIED ROUTE DATA</strong></div></div></article><div class="stack"><article class="card"><div class="card-head"><div><h3>Verified Risk Evidence</h3><p>No invented category percentages; each card shows a backend metric.</p></div></div><div class="card-body"><div class="grid-3" id="riskEvidenceGrid"><div class="empty">Calculate a voyage to populate risk evidence.</div></div></div></article><article class="card"><div class="card-head"><div><h3>Route Hazard Encounters</h3><p>Time-matched iceberg hazard evidence returned by the route engine.</p></div></div><div class="card-body"><div class="hazard-list" id="hazardList"><div class="empty">No selected-route hazards.</div></div></div></article></div></div></div></section>
+
+      <section class="page-view" id="dataObservatory"><div class="page-inner"><div class="page-heading"><div><h2>Data Observatory</h2><p>Source status, provenance and coverage used by the running application.</p></div><div class="status-line"><span class="tag">Health: <b id="observatoryHealth">--</b></span><span class="tag" id="observatoryMode">Checking…</span></div></div><article class="card"><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Source</th><th>Provider</th><th>Status</th><th>Latest / coverage</th><th>Data type</th></tr></thead><tbody id="observatoryBody"><tr><td colspan="5">Loading provenance…</td></tr></tbody></table></div></div></article></div></section>
+
+      <section class="page-view" id="riskDetails"><div class="page-inner"><div class="page-heading"><div><h2>Risk Details / Iceberg Information</h2><p>Official observation, distinct archived fixes, and clearly separated future model trajectory.</p></div><select id="riskIcebergSelect" onchange="loadSelectedIcebergDetails('risk')"><option value="">Select official iceberg…</option></select></div><article class="card"><div class="card-head"><div><h3 id="riskIcebergName">Select an iceberg</h3><p id="riskIcebergMeta">Official USNIC metadata will appear here.</p></div><span class="tag">USNIC + physics model</span></div><div class="card-body"><div class="grid-2"><div><h3 style="font-size:.78rem">Official history</h3><div id="riskIcebergHistory"><div class="empty">Select an iceberg.</div></div></div><div><h3 style="font-size:.78rem">Model forecast path</h3><div class="hint" id="riskConfidence" style="margin-bottom:8px">Model confidence is not certified.</div><div class="table-wrap"><table><thead><tr><th>Horizon</th><th>UTC</th><th>Position</th><th>Speed</th><th>Uncertainty</th><th>Type</th></tr></thead><tbody id="riskForecastTable"><tr><td colspan="6">Select an iceberg.</td></tr></tbody></table></div></div></div></div></article></div></section>
+
+      <section class="page-view" id="alertsSection"><div class="page-inner"><div class="page-heading"><div><h2>Alerts & Notifications</h2><p>Alerts are derived from the current selected route and real source availability/freshness. They do not claim safety when no alert is present.</p></div><button class="btn btn-secondary btn-small" onclick="refreshData()">Refresh Evidence</button></div><div class="alerts-list" id="alertsList"><div class="empty">Evaluating current data rules…</div></div></div></section>
+
+      <section class="page-view" id="scenarioSection"><div class="page-inner"><div class="page-heading"><div><h2>What-If Scenario Simulator</h2><p>Changes only operator-controllable route parameters. Environmental data remains real and unchanged.</p></div><span class="tag">MODEL OUTPUT · not observation</span></div><div class="grid-2"><article class="card"><div class="card-head"><div><h3>Scenario Inputs</h3><p>Vessel speed and safety buffer are supported directly by the verified backend.</p></div></div><div class="card-body"><div class="form-grid"><div class="field"><label>Vessel speed (km/h)</label><input id="scenarioSpeed" type="number" min="1" max="70" step="0.5" value="20"></div><div class="field"><label>Safety buffer (km)</label><input id="scenarioSafety" type="number" min="5" max="150" step="1" value="30"></div></div><div class="actions"><button class="btn btn-primary" onclick="runScenario()">Run Scenario</button></div><div class="analysis-status" id="scenarioStatus">Select route endpoints in Voyage Planner, then run a scenario.</div></div></article><article class="card"><div class="card-head"><div><h3>Scenario Result</h3><p>Compared against the current selected route when available.</p></div></div><div class="card-body"><div class="summary-grid"><div class="summary"><div class="k">Recommended profile</div><div class="v" id="scenarioProfile">--</div></div><div class="summary"><div class="k">Risk</div><div class="v" id="scenarioRisk">--</div></div><div class="summary"><div class="k">ETA</div><div class="v" id="scenarioEta">--</div></div><div class="summary"><div class="k">Distance</div><div class="v" id="scenarioDistance">--</div></div></div><div class="evidence-box" id="scenarioDelta" style="margin-top:10px">No scenario has been run.</div></div></article></div></div></section>
+
+      <section class="page-view" id="aiSection"><div class="page-inner"><div class="page-heading"><div><h2>NAV-X AI Decision Center</h2><p>Structured, explainable navigation intelligence from physics-informed iceberg ML, AIS anomaly detection and calculated route evidence. No free-form conversational interface or generative LLM is used.</p></div><button class="btn btn-secondary btn-small" onclick="refreshAiDecisionCenter(true)">Refresh AI Analysis</button></div><div class="ai-grid"><div class="ai-stat"><div class="k">Iceberg drift ML</div><div class="v" id="aiDriftStatus">checking…</div><div class="s" id="aiDriftSamples">--</div></div><div class="ai-stat"><div class="k">Validation gate</div><div class="v" id="aiGateStatus">--</div><div class="s" id="aiValidationText">--</div></div><div class="ai-stat"><div class="k">AIS anomaly ML</div><div class="v" id="aiAisStatus">checking…</div><div class="s" id="aiAisSamples">--</div></div><div class="ai-stat"><div class="k">Decision readiness</div><div class="v" id="aiDecisionReadiness">NO ROUTE</div><div class="s" id="aiDecisionCompleteness">Generate a voyage to create an evidence-backed recommendation.</div></div></div><article class="card decision-hero"><div class="card-head"><div><h3>AI Route Decision</h3><p>The decision layer compares only the routes and measurements returned by the NAV-X backend. Missing evidence remains unavailable.</p></div><span class="tag" id="aiDecisionMode">STRUCTURED / EXPLAINABLE</span></div><div class="card-body"><div class="decision-profile"><span class="decision-badge" id="aiDecisionState">AWAITING ROUTE</span><div class="route-name" id="aiDecisionProfile">No recommendation yet</div></div><div class="decision-summary" id="aiDecisionSummary">Generate FASTEST, BALANCED and SAFEST route alternatives to produce an evidence-backed decision report.</div><div class="decision-metrics"><div class="decision-metric"><div class="k">Risk</div><div class="v" id="aiDecisionRisk">--</div></div><div class="decision-metric"><div class="k">Minimum CPA</div><div class="v" id="aiDecisionCpa">--</div></div><div class="decision-metric"><div class="k">Iceberg clearance</div><div class="v" id="aiDecisionClearance">--</div></div><div class="decision-metric"><div class="k">ETA</div><div class="v" id="aiDecisionEta">--</div></div></div><div class="decision-evidence"><div class="decision-panel"><h4>Evidence supporting the recommendation</h4><ul class="decision-list" id="aiDecisionReasons"><li>No route analysis is available yet.</li></ul></div><div class="decision-panel"><h4>Operational trade-offs</h4><ul class="decision-list" id="aiDecisionTradeoffs"><li>Generate a voyage to compare ETA, distance and safety evidence.</li></ul></div></div><div class="table-wrap" style="margin-top:13px"><table><thead><tr><th>Profile</th><th>Risk</th><th>ETA</th><th>Distance</th><th>Min CPA</th><th>Clearance</th><th>Hazards</th><th>Max sea ice</th></tr></thead><tbody id="aiRouteMatrixBody"><tr><td colspan="8">NO ROUTE EVIDENCE</td></tr></tbody></table></div><div class="hint" style="margin-top:9px">Decision support only. The system does not issue autonomous helm commands and does not replace official navigation products or qualified human judgment.</div></div></article><div class="ai-layout"><article class="card"><div class="card-head"><div><h3>ML Model Evidence</h3><p>Saved model-card values from the real-data training pipeline.</p></div><span class="tag" id="aiModelVersion">--</span></div><div class="card-body"><div class="model-evidence"><div class="model-row"><strong>Algorithm</strong><span id="aiAlgorithm">--</span></div><div class="model-row"><strong>Real samples</strong><span id="aiTrainingSamples">--</span></div><div class="model-row"><strong>Physics baseline</strong><span id="aiPhysicsMae">--</span></div><div class="model-row"><strong>Physics + ML</strong><span id="aiHybridMae">--</span></div><div class="model-row"><strong>Training sources</strong><span id="aiTrainingSources">--</span></div><div class="model-row"><strong>Scientific integrity</strong><span>ML predicts only a residual correction to the physical drift model. Official USNIC fixes remain observations; future coordinates remain model outputs.</span></div></div><div class="analysis-status" id="aiTrainingNote" style="margin-top:12px">Loading model card…</div></div></article><article class="card"><div class="card-head"><div><h3>AIS Anomaly Monitor</h3><p>Isolation Forest scoring of genuine received AIS movement features when a trained model is available.</p></div><button class="btn btn-secondary btn-small" onclick="loadAiAnomalies()">Refresh AIS Analysis</button></div><div class="card-body"><div class="anomaly-summary"><div><strong id="aiAnomalyMonitorStatus">Checking model status…</strong><span id="aiAnomalySummary">No anomaly result loaded.</span></div><span class="tag">Statistical pattern only</span></div><div class="table-wrap"><table><thead><tr><th>Vessel</th><th>MMSI</th><th>Assessment</th><th>Anomaly score</th><th>Last AIS update</th></tr></thead><tbody id="aiAnomalyBody"><tr><td colspan="5">Waiting for AIS model status…</td></tr></tbody></table></div><div class="hint" style="margin-top:8px">An anomaly means statistically unusual movement relative to the genuine training set. It is not a declaration of danger or intent.</div></div></article></div><article class="card"><div class="card-head"><div><h3>Operational AI Pipeline</h3><p>Where machine learning contributes to the navigation decision without replacing physical constraints.</p></div><span class="tag">No generative AI</span></div><div class="card-body"><div class="pipeline-steps"><div class="pipeline-step"><strong>1 · Physical forcing</strong><span>CMEMS currents + ECMWF/ERA5 wind establish the iceberg-drift baseline.</span></div><div class="pipeline-step"><strong>2 · ML residual correction</strong><span>Random Forest correction is applied only when held-out validation beats the physics baseline.</span></div><div class="pipeline-step"><strong>3 · Hazard & route engine</strong><span>Forecast positions, sea ice, CPA/TCA and ocean validity influence Polar A* route costs.</span></div><div class="pipeline-step"><strong>4 · Explainable decision</strong><span>Calculated route metrics are compared and surfaced as structured evidence, not conversational claims.</span></div></div></div></article></div></section>
+
+      <section class="page-view" id="historicalSection"><div class="page-inner"><div class="page-heading"><div><h2>Iceberg History & Current Tracking</h2><p>Published historical BYU/NIC tracks plus current authoritative USNIC observations. Historical positions are never treated as current hazards.</p></div><select id="historySnapshot" onchange="renderHistoricalReplay()"></select></div><div class="replay-grid"><article class="card"><div class="card-head"><div><h3>Current-era USNIC Snapshot Replay</h3><p id="historyStatus">Loading archived official USNIC snapshots…</p></div></div><div class="card-body"><div class="replay-canvas"><canvas id="historyCanvas"></canvas></div></div></article><article class="card"><div class="card-head"><div><h3>Official Snapshot Fixes</h3><p>Coordinates exactly as stored in archived USNIC source tables.</p></div></div><div class="card-body"><div class="table-wrap" style="max-height:510px"><table><thead><tr><th>Iceberg</th><th>Position</th><th>Dimensions</th><th>Observed</th></tr></thead><tbody id="historyTable"><tr><td colspan="4">Loading…</td></tr></tbody></table></div></div></article></div><article class="card" style="margin-top:16px"><div class="card-head"><div><h3>Historical Track Catalogue</h3><p id="historyCatalogStatus">Loading database-backed historical iceberg tracks…</p></div><span class="tag">HISTORICAL · NOT CURRENT HAZARDS</span></div><div class="card-body"><div class="search-row"><input id="historyCatalogSearch" placeholder="Search A23A, B15, A68…" oninput="renderHistoryCatalog()"><button class="btn btn-secondary btn-small" onclick="document.getElementById('historyCatalogSearch').value='';renderHistoryCatalog()">Clear</button></div><div class="table-wrap" style="max-height:460px"><table><thead><tr><th>Designation</th><th>First published fix</th><th>Latest stored fix</th><th>Positions</th><th>Current state</th><th>Action</th></tr></thead><tbody id="historyCatalogTable"><tr><td colspan="6">LOADING HISTORICAL CATALOGUE…</td></tr></tbody></table></div><div class="hint" style="margin-top:9px">BYU/NIC historical tracks support replay, analysis and research. The current map and routing hazard layer continue to use the latest official USNIC table only.</div></div></article><div class="replay-grid" style="margin-top:16px"><article class="card"><div class="card-head"><div><h3>Selected Iceberg Track</h3><p id="historyTrackStatus">Choose Track from the catalogue.</p></div></div><div class="card-body"><div class="replay-canvas"><canvas id="historyTrackCanvas"></canvas></div></div></article><article class="card"><div class="card-head"><div><h3>Published Track Positions</h3><p>Source and sensor remain visible for every stored observation.</p></div></div><div class="card-body"><div class="table-wrap" style="max-height:510px"><table><thead><tr><th>Date</th><th>Position</th><th>Source</th><th>Sensor / type</th></tr></thead><tbody id="historyTrackTable"><tr><td colspan="4">SELECT AN ICEBERG TRACK</td></tr></tbody></table></div></div></article></div></div></section>
+
+      <section class="page-view" id="icebergCatalog">
+
+  <div class="page-inner">
+
+    <div class="page-heading">
+
+      <div>
+
+        <h2>
+          Unified Iceberg Catalog
+        </h2>
+
+        <p>
+          Source-labelled Antarctic iceberg records combining
+          authoritative current USNIC observations,
+          supplemental BYU/SCP ASCAT + OSCAT-2 observations,
+          and published BYU/NIC historical tracks.
+        </p>
+
+      </div>
+
+
+      <button
+        class="btn btn-secondary btn-small"
+        onclick="navigateTo('mapSection')"
+      >
+        Open Current Map
+      </button>
+
+    </div>
+
+
+    <div class="data-banner">
+
+      <div>
+        ICE
+      </div>
+
+      <div>
+
+        <strong>
+          REAL SOURCE-LABELLED ICEBERG DATABASE
+        </strong>
+
+        <span id="icebergSourceText">
+          Loading unified iceberg database…
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="summary-grid"
+      style="
+        grid-template-columns:
+        repeat(5,minmax(0,1fr));
+        margin-bottom:16px
+      "
+    >
+
+      <div class="summary">
+
+        <div class="k">
+          Unique Icebergs
+        </div>
+
+        <div
+          class="v"
+          id="catalogUniqueCount"
+        >
+          --
+        </div>
+
+        <div class="s">
+          Stored designations
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <div class="k">
+          Total Observations
+        </div>
+
+        <div
+          class="v"
+          id="catalogObservationCount"
+        >
+          --
+        </div>
+
+        <div class="s">
+          Source-labelled positions
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <div class="k">
+          Official Current
+        </div>
+
+        <div
+          class="v"
+          id="catalogUsnicCount"
+        >
+          --
+        </div>
+
+        <div class="s">
+          Latest USNIC snapshot
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <div class="k">
+          Supplemental Current
+        </div>
+
+        <div
+          class="v"
+          id="catalogByuCurrentCount"
+        >
+          --
+        </div>
+
+        <div class="s">
+          BYU/SCP
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <div class="k">
+          Historical Positions
+        </div>
+
+        <div
+          class="v"
+          id="catalogHistoricalCount"
+        >
+          --
+        </div>
+
+        <div class="s">
+          BYU/NIC archive
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <article class="card">
+
+      <div class="card-body">
+
+        <div class="search-row">
+
+          <input
+            id="icebergSearch"
+            placeholder="Search A23A, B15, A68, source or status…"
+            oninput="renderIcebergTable()"
+          >
+
+
+          <button
+            class="btn btn-secondary btn-small"
+            onclick="
+              document.getElementById(
+                'icebergSearch'
+              ).value='';
+
+              renderIcebergTable();
+            "
+          >
+            Clear
+          </button>
+
+
+          <button
+            class="btn btn-secondary btn-small"
+            onclick="loadHistoryCatalog()"
+          >
+            Refresh Catalog
+          </button>
+
+        </div>
+
+
+        <div
+          class="table-wrap"
+          style="max-height:650px"
+        >
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Designation
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  First Observation
+                </th>
+
+                <th>
+                  Latest Observation
+                </th>
+
+                <th>
+                  Positions
+                </th>
+
+                <th>
+                  Sources
+                </th>
+
+                <th>
+                  Historical Track
+                </th>
+
+                <th>
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody id="icebergTable">
+
+              <tr>
+
+                <td colspan="8">
+
+                  LOADING UNIFIED ICEBERG DATABASE…
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <div
+          class="hint"
+          style="margin-top:10px"
+        >
+
+          USNIC remains the authoritative current source.
+          BYU/SCP is displayed as supplemental current data.
+          Historical BYU/NIC positions are available for
+          research and track replay and are not automatically
+          treated as present-day navigation hazards.
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </div>
+
+</section>
+      <section class="page-view" id="vesselCatalog"><div class="page-inner"><div class="page-heading"><div><h2>AIS Vessel Catalog</h2><p>Only positions actually received from the configured provider are shown.</p></div><button class="btn btn-secondary btn-small" onclick="navigateTo('mapSection')">Open Map</button></div><div class="data-banner"><div>AIS</div><div><strong id="aisSourceTitle">AIS feed</strong><span id="aisSourceText">Checking configured provider…</span></div></div><article class="card"><div class="card-body"><div class="search-row"><input id="vesselSearch" placeholder="Search name, MMSI, IMO, callsign or type" oninput="renderVesselTable()"><button class="btn btn-secondary btn-small" onclick="document.getElementById('vesselSearch').value='';renderVesselTable()">Clear</button><button class="btn btn-secondary btn-small" onclick="loadVessels()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Vessel</th><th>Identifiers</th><th>Position</th><th>SOG / COG / HDG</th><th>Navigation / destination</th><th>AIS update</th><th>Source / quality</th><th>Action</th></tr></thead><tbody id="vesselTable"><tr><td colspan="8">WAITING FOR AIS PROVIDER RESPONSE…</td></tr></tbody></table></div></div></article></div></section>
+
+      <section class="page-view" id="settingsSection"><div class="page-inner"><div class="page-heading"><div><h2>Profile & Settings</h2><p>Local display/session preferences. These controls do not change scientific datasets or route calculations.</p></div></div><div class="settings-grid"><article class="card"><div class="card-head"><div><h3>Operator Session</h3><p>No fabricated profile identity is created by the operator console.</p></div></div><div class="card-body"><div class="setting-row"><div><strong>Session mode</strong><span>Local / same-origin NAV-X operator console</span></div><span class="state-pill state-ok">ACTIVE</span></div><div class="setting-row"><div><strong>Scientific integrity</strong><span>Missing data remains unavailable; observations and forecasts are separated.</span></div><span class="state-pill state-ok">ENFORCED</span></div></div></article><article class="card"><div class="card-head"><div><h3>System Settings</h3></div></div><div class="card-body"><div class="setting-row"><div><strong>Appearance</strong><span>Light or dark interface</span></div><select id="settingsTheme" onchange="setThemeFromSelect(this.value)"><option value="light">Light</option><option value="dark">Dark</option></select></div><div class="setting-row"><div><strong>Auto Refresh</strong><span id="autoRefreshStatus">Off</span></div><label class="switch"><input id="autoRefreshToggle" type="checkbox" onchange="toggleAutoRefresh(this.checked)"><span class="slider"></span></label></div><div class="setting-row"><div><strong>Units</strong><span>Route distance km · AIS speed knots · forcing m/s</span></div><span class="tag">Scientific</span></div></div></article></div></div></section>
+    </div>
+  </main>
+</div>
+<script type="module">
+let maplibregl=null;
+try{maplibregl=await import('https://unpkg.com/maplibre-gl@6.7.0/dist/maplibre-gl.mjs')}
+catch(primaryError){
+  console.warn('Primary MapLibre CDN unavailable; trying secondary CDN.');
+  try{maplibregl=await import('https://cdn.jsdelivr.net/npm/maplibre-gl@6.7.0/dist/maplibre-gl.mjs')}
+  catch(secondaryError){console.error('MapLibre library could not be loaded from either CDN.')}
+}
+
+const q=id=>document.getElementById(id);
+const NORTH_LIMIT=-45;
+const HORIZONS=[0,6,12,24,48,72];
+const ROUTE_LAYER_IDS={FASTEST:'navx-route-fastest',BALANCED:'navx-route-balanced',SAFEST:'navx-route-safest'};
+const ROUTE_COLORS={FASTEST:'#147fa8',BALANCED:'#158a67',SAFEST:'#6458c9'};
+const MAX_INITIAL_FORECASTS=4;
+const MAX_REFINEMENT_FORECASTS=2;
+const viewMeta={
+  homeSection:['Home','Real-data Antarctic navigation decision support with explicit provenance and availability states.'],
+  mapSection:['Live Map','Interactive Antarctic workspace with official observations, AIS, environmental layers and verified routes.'],
+  forecastSection:['Forecast','Environmental forcing and iceberg trajectory guidance derived from real scientific inputs.'],
+  plannerSection:['Voyage Planner','Choose verified references or validated ocean cells and compare real-data route alternatives.'],
+  graphSection:['Route Details','Compare backend-calculated route geometry, travel time, risk, clearance and sea-ice exposure.'],
+  riskDashboard:['Risk Dashboard','Selected-route risk metrics and hazard evidence from the current backend analysis.'],
+  dataObservatory:['Data Observatory','Live status, provenance and freshness of the scientific data used by NAV-X.'],
+  riskDetails:['Risk Details','Inspect an official USNIC iceberg observation, history and physics-informed forecast evidence.'],
+  alertsSection:['Alerts & Notifications','Rule-derived notices from current route analysis and real data-source conditions.'],
+  aiSection:['AI Decision Center','Physics-informed ML status, AIS anomaly detection and structured explainable route decision support.'],
+  scenarioSection:['Scenario Simulator','Run what-if routing with operator speed and safety-buffer changes against the same real data.'],
+  historicalSection:['Iceberg History & Current Tracking','Published BYU/NIC historical tracks plus current authoritative USNIC observations.'],
+  icebergCatalog:['Unified Iceberg Catalog','USNIC official current, BYU/SCP supplemental current and BYU/NIC historical iceberg observations.'],
+  vesselCatalog:['AIS Vessel Catalog','Genuine received AIS positions only.'],
+  settingsSection:['Profile & Settings','Local display and operator-session preferences. No navigation data is altered here.']
+};
+const state={
+  map:null,mapReady:false,mapConfig:null,locations:[],icebergs:[],icebergMeta:null,vessels:[],nearby:[],forecasts:[],routeResult:null,activeProfile:null,projection:'globe',
+  origin:null,destination:null,gps:null,gpsWatchId:null,gpsMode:'IDLE',followGps:false,forecastHorizon:0,pickMode:null,iceExtent:null,
+  markers:{gps:null,origin:null,destination:null,ice:[],vessel:[],points:[],forecast:[],routeLabels:[],checkpoints:[],cpa:null},
+  layers:{icebergs:true,forecast:true,vessels:true,currents:false,wind:false,seaice:false,routes:true,hazards:true},
+  overlaysLoaded:false,routeHandlersBound:false,suppressNextMapClick:false,forecastCache:new Map(),health:null,provenance:null,archive:null,historyCatalog:null,historyTrack:null,environmental:null,scenarioResult:null,aiStatus:null,aiDecision:null,aiAnomalies:null,autoRefresh:false,autoRefreshTimer:null
+};
+
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function normLon(v){let x=Number(v);while(x>180)x-=360;while(x<-180)x+=360;return x}
+function validPoint(p){return p&&Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lon))&&Number(p.lat)>=-90&&Number(p.lat)<=90&&Number(p.lon)>=-180&&Number(p.lon)<=180}
+function hav(aLat,aLon,bLat,bLon){const R=6371,p1=aLat*Math.PI/180,p2=bLat*Math.PI/180,dp=(bLat-aLat)*Math.PI/180,dl=normLon(bLon-aLon)*Math.PI/180,s=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(s)))}
+function fmtCoord(lat,lon){const la=Math.abs(Number(lat)).toFixed(5)+(Number(lat)<0?'°S':'°N'),lo=Math.abs(Number(lon)).toFixed(5)+(Number(lon)<0?'°W':'°E');return `${la}, ${lo}`}
+function formatDuration(hours){if(!Number.isFinite(Number(hours)))return'N/A';const h=Number(hours),d=Math.floor(h/24),rh=Math.floor(h-d*24),m=Math.round((h-Math.floor(h))*60);return d?`${d}d ${rh}h ${m}m`:`${rh}h ${m}m`}
+function formatUtc(v){return v?String(v).replace('T',' ').replace('Z',' UTC'):'N/A'}
+async function getJson(url){const r=await fetch(url,{cache:'no-store'});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||data.detail||`HTTP ${r.status}`);return data}
+async function postJson(url,body=null){const opts={method:'POST',headers:{'Content-Type':'application/json'}};if(body!==null)opts.body=JSON.stringify(body);const r=await fetch(url,opts);const data=await r.json().catch(()=>({}));if(!r.ok){const detail=data.error||data.detail||`HTTP ${r.status}`;const err=new Error(detail);err.payload=data;throw err}return data}
+function checkAntarctic(p,label){if(!validPoint(p))throw new Error(`${label} coordinates are invalid.`);if(Number(p.lat)>NORTH_LIMIT)throw new Error(`${label} must be south of 45°S for Antarctic route analysis.`)}
+function setAnalysis(text,type=''){const el=q('analysisStatus');if(!el)return;el.textContent=text;el.className='analysis-status'+(type?` ${type}`:'')}
+function theme(){return document.documentElement.dataset.theme||'light'}
+function initTheme(){document.documentElement.dataset.theme=localStorage.getItem('navx-theme')||'light';syncTheme()}
+function syncTheme(){const light=theme()==='light';q('themeIcon').textContent=light?'☾':'☀';q('themeToggle').title=light?'Switch to dark mode':'Switch to light mode';if(q('settingsTheme'))q('settingsTheme').value=theme();drawRouteGraph();drawIceExtentGraph();if(state.archive)drawHistoricalPlot((state.archive.snapshots?.[Number(q('historySnapshot')?.value)||0]?.icebergs?.features)||[])}
+function toggleTheme(){document.documentElement.dataset.theme=theme()==='dark'?'light':'dark';localStorage.setItem('navx-theme',theme());syncTheme()}
+function showView(id,push=true){
+  document.querySelectorAll('.page-view').forEach(x=>x.classList.toggle('active',x.id===id));
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===id));
+  const m=viewMeta[id]||viewMeta.homeSection;
+  q('pageTitle').textContent=m[0];q('pageSubtitle').textContent=m[1];
+  if(push&&location.hash!==`#${id}`)history.pushState(null,'',`#${id}`);
+  if(id==='mapSection'&&state.mapReady)setTimeout(()=>state.map.resize(),80);
+  if(id==='graphSection')setTimeout(()=>{drawRouteGraph();drawIceExtentGraph();renderRouteComparisonTable()},80);
+  if(id==='riskDashboard'||id==='alertsSection'||id==='riskDetails'||id==='homeSection')setTimeout(updateRouteDependentPanels,20);
+  if(id==='historicalSection')setTimeout(()=>{if(state.archive)renderHistoricalReplay();if(state.historyCatalog)renderHistoryCatalog();if(state.historyTrack)drawHistoricalTrack(state.historyTrack.observations||[]);},20);
+  if(id==='dataObservatory')setTimeout(renderDataObservatory,20);
+  if(id==='aiSection')setTimeout(()=>{refreshAiDecisionCenter(true);},20);
+}
+function activateNav(_,id){showView(id,true)} function navigateTo(id){showView(id,true)}
+setInterval(()=>q('utcClock').textContent=new Date().toISOString().replace('T',' ').slice(0,19)+' UTC',1000);
+
+function markerEl(cls,text=''){const el=document.createElement('div');el.className=cls;if(text)el.textContent=text;el.addEventListener('click',e=>e.stopPropagation());return el}
+function popupHtml(name,lat,lon,extra=''){const dist=state.gps?`${hav(state.gps.lat,state.gps.lon,lat,lon).toFixed(1)} km from current GPS`:'GPS distance unavailable';return `<div class="popup-title">${esc(name)}</div><div class="popup-meta">${esc(fmtCoord(lat,lon))}<br>${esc(dist)}${extra?`<br>${extra}`:''}</div>`}
+function removeMarker(m){try{m?.remove()}catch(_){}}
+function clearMarkers(name){const v=state.markers[name];if(Array.isArray(v)){v.forEach(removeMarker);state.markers[name]=[]}else{removeMarker(v);state.markers[name]=null}}
+function setSingleMarker(name,marker){clearMarkers(name);state.markers[name]=marker}
+function addClickableMarker(name,lat,lon,el,extra=''){if(!state.mapReady)return null;const lng=normLon(lon),la=Number(lat),popup=new maplibregl.Popup({offset:18,closeButton:false,closeOnClick:false}).setHTML(popupHtml(name,la,lng,extra));const marker=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([lng,la]).setPopup(popup).addTo(state.map);el.addEventListener('mouseenter',()=>{try{popup.setLngLat([lng,la]).addTo(state.map)}catch(_){}});el.addEventListener('mouseleave',()=>{try{popup.remove()}catch(_){}});return marker}
+function ensureGeoSource(id,data){if(!state.mapReady)return;const src=state.map.getSource(id);if(src)src.setData(data);else state.map.addSource(id,{type:'geojson',data})}
+function lineGeo(path){const coords=[];let prev=null;for(const p of path||[]){if(!validPoint(p))continue;let lon=normLon(p.lon);if(prev!==null){while(lon-prev>180)lon-=360;while(lon-prev<-180)lon+=360}coords.push([lon,Number(p.lat)]);prev=lon}return{type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{}}}
+function clearGeo(id){if(!state.mapReady)return;try{if(state.map.getLayer(id))state.map.removeLayer(id);if(state.map.getSource(id))state.map.removeSource(id)}catch(_){}}
+function setLine(id,path,paint={}){if(!state.mapReady)return;ensureGeoSource(id,lineGeo(path));if(!state.map.getLayer(id))state.map.addLayer({id,type:'line',source:id,layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':paint.color||'#147fa8','line-width':paint.width||4,'line-opacity':paint.opacity??.9,'line-dasharray':paint.dashed?[2,2]:[1,0]}});else{state.map.setPaintProperty(id,'line-color',paint.color||'#147fa8');state.map.setPaintProperty(id,'line-width',paint.width||4);state.map.setPaintProperty(id,'line-opacity',paint.opacity??.9)}}
+function circlePolygon(lat,lon,radiusKm,steps=48){const coords=[],R=6371,d=radiusKm/R,p1=lat*Math.PI/180,l1=lon*Math.PI/180;for(let i=0;i<=steps;i++){const br=2*Math.PI*i/steps,phi=Math.asin(Math.sin(p1)*Math.cos(d)+Math.cos(p1)*Math.sin(d)*Math.cos(br)),lam=l1+Math.atan2(Math.sin(br)*Math.sin(d)*Math.cos(p1),Math.cos(d)-Math.sin(p1)*Math.sin(phi));coords.push([normLon(lam*180/Math.PI),phi*180/Math.PI])}return coords}
+function setView(lat,lon,zoom=5){if(state.mapReady)state.map.easeTo({center:[normLon(lon),Number(lat)],zoom,duration:650})}
+function syncFollowGpsButton(){const b=q('followGpsBtn');if(b)b.textContent=`Follow GPS: ${state.followGps?'On':'Off'}`}
+function resetAntarcticView(){state.followGps=false;syncFollowGpsButton();setView(-70,0,2.7)}
+
+async function startMapWithStyle(style,label,allowAutomaticFallback=false){
+  return new Promise((resolve,reject)=>{
+    let settled=false,loaded=false,errorCount=0,loadedAt=0;
+    state.mapReady=false;
+    try{state.map?.remove()}catch(_){}
+    let map;
+    try{
+      map=new maplibregl.Map({container:'navxMap',style,center:[0,-70],zoom:2.7,maxZoom:16,attributionControl:true,projection:state.projection||'globe'});
+      state.map=map;
+      map.addControl(new maplibregl.NavigationControl({showCompass:true,showZoom:true,visualizePitch:true}),'top-right');
+      map.addControl(new maplibregl.GlobeControl(),'top-right');
+      map.on('style.load',()=>{
+        try{
+          map.setFog(state.projection==='mercator'?null:{
+            range:[0.5,10],color:'#dfeef6','high-color':'#1f7fb3','horizon-blend':.05,'space-color':document.documentElement.getAttribute('data-theme')==='dark'?'#050b12':'#bcdcef','star-intensity':.15
+          });
+        }catch(_){}
+      });
+    }catch(e){reject(e);return}
+    const timer=setTimeout(()=>{
+      if(settled)return;
+      settled=true;
+      try{map.remove()}catch(_){}
+      reject(new Error(`${label} initialization timed out`));
+    },9000);
+    map.on('load',async()=>{
+      if(settled)return;
+      settled=true;loaded=true;loadedAt=Date.now();clearTimeout(timer);
+      state.mapReady=true;state.activeBasemapLabel=label;state.fallbackSwitching=false;
+      q('mapLoading').classList.add('hidden');
+      q('mapStatusText').textContent=`Map Status: Operational · ${label}`;
+      q('mapStatusDot').className='status-dot ok';
+      setTimeout(()=>state.map.resize(),60);
+      renderAllMarkers();renderAllRoutes(false);renderForecastAtHorizon();
+      await loadScientificOverlays();loadVessels().catch(()=>{});
+      resolve(true);
+    });
+    map.on('click',e=>handleMapClick(e));
+    map.on('error',e=>{
+      errorCount++;
+      const msg=e?.error?.message||'map resource request failed';
+      console.warn(`Map rendering error (${label})`,msg);
+      if(!loaded&&!settled){
+        settled=true;clearTimeout(timer);
+        try{map.remove()}catch(_){}
+        reject(new Error(msg));
+        return;
+      }
+      if(loaded){
+        q('mapStatusText').textContent=`Map resource warning · ${label}`;
+        if(allowAutomaticFallback&&!state.fallbackSwitching&&Date.now()-loadedAt<6000&&errorCount>=3){
+          state.fallbackSwitching=true;
+          setTimeout(()=>switchToFallbackMap('Primary basemap resources were unavailable.'),0);
+        }
+      }
+    });
+  });
+}
+async function switchToFallbackMap(reason='Primary basemap unavailable.'){
+  if(!state.mapConfig?.fallback_style_url){showMapFailure(`${reason} No fallback style is configured.`);return}
+  state.mapReady=false;state.overlaysLoaded=false;state.routeHandlersBound=false;
+  q('mapLoading').classList.remove('hidden');q('mapRetryBtn').style.display='none';
+  q('mapLoadingTitle').textContent='Switching to OpenStreetMap fallback';
+  q('mapLoadingText').textContent=`${reason} Loading the keyless raster fallback…`;
+  try{
+    await startMapWithStyle(state.mapConfig.fallback_style_url,'OpenStreetMap fallback',false);
+    q('mapProviderTag').textContent='Map: OpenStreetMap fallback + MapLibre GL JS';
+  }catch(e){showMapFailure(`Both keyless basemap providers failed. Check internet access or firewall/DNS settings. ${e.message}`)}
+}
+async function initMap(){
+  if(!maplibregl){showMapFailure('Map library could not be loaded. Check internet/CDN access, then retry.');return}
+  try{state.mapConfig=await getJson('/api/config/map')}catch(e){showMapFailure(`Map configuration unavailable: ${e.message}`);return}
+  q('mapProviderTag').textContent=`Map: ${state.mapConfig.provider||'Keyless basemap'}`;
+  if(!state.mapConfig.enabled){showMapFailure('Map provider is disabled by server configuration.');return}
+  const primaryStyle=state.mapConfig.style_url;
+  if(!primaryStyle){showMapFailure('Map configuration is incomplete. No primary style URL was supplied.');return}
+  state.fallbackSwitching=false;
+  try{
+    q('mapLoading').classList.remove('hidden');q('mapLoadingTitle').textContent='Loading OpenFreeMap';q('mapLoadingText').textContent='Loading the keyless OpenStreetMap-based vector basemap…';q('mapRetryBtn').style.display='none';
+    await startMapWithStyle(primaryStyle,'OpenFreeMap',true);
+  }catch(e){
+    await switchToFallbackMap(`OpenFreeMap could not be initialized: ${e.message}`);
+  }
+}
+function showMapFailure(message){q('mapLoading').classList.remove('hidden');q('mapLoadingTitle').textContent='MAP PROVIDER ERROR';q('mapLoadingText').textContent=message;q('mapRetryBtn').style.display='inline-flex';q('mapStatusText').textContent='Map Status: Provider Error';q('mapStatusDot').className='status-dot bad'}
+function retryMap(){try{state.map?.remove()}catch(_){}state.map=null;state.mapReady=false;state.overlaysLoaded=false;state.routeHandlersBound=false;q('mapLoadingTitle').textContent='Retrying map initialization';q('mapLoadingText').textContent='Retrying keyless basemap providers…';q('mapRetryBtn').style.display='none';initMap()}
+
+function renderAllMarkers(){renderIceMarkers();renderVesselMarkers();renderReferenceMarkers();renderGps();renderOrigin();renderDestination()}
+function renderIceMarkers(){clearMarkers('ice');if(!state.mapReady||!state.layers.icebergs)return;state.icebergs.forEach(ib=>{const dims=Number.isFinite(ib.lengthNm)||Number.isFinite(ib.widthNm)?`${Number.isFinite(ib.lengthNm)?ib.lengthNm:'N/A'} × ${Number.isFinite(ib.widthNm)?ib.widthNm:'N/A'} NM`:'Dimensions N/A',age=Number.isFinite(ib.age)?`${ib.age.toFixed(1)} h old`:'age N/A',unc=Number.isFinite(ib.uncertaintyKm)?`published/derived position uncertainty ${ib.uncertaintyKm.toFixed(1)} km`:'position uncertainty not published';const extra=`USNIC REAL OBSERVATION · observed ${ib.observed} · ${dims} · ${age} · ${unc} · ${ib.coordinatePrecision||'source precision retained'}`;const m=addClickableMarker(`Iceberg ${ib.id}`,ib.lat,ib.lon,markerEl('marker-ice','◆'),extra);if(m)state.markers.ice.push(m)})}
+function renderVesselMarkers(){clearMarkers('vessel');if(!state.mapReady||!state.layers.vessels)return;state.vessels.forEach(v=>{const el=markerEl('marker-vessel','▲'),deg=Number(v.cog_deg??v.heading_deg??0);el.style.transform=`rotate(${Number.isFinite(deg)?deg:0}deg)`;const sog=Number.isFinite(Number(v.sog_knots))?`${Number(v.sog_knots).toFixed(1)} kn`:'SOG N/A',cog=Number.isFinite(Number(v.cog_deg))?`${Number(v.cog_deg).toFixed(0)}°`:'COG N/A',hdg=Number.isFinite(Number(v.heading_deg))?`${Number(v.heading_deg).toFixed(0)}°`:'HDG N/A';const extra=`${v.source||'AIS'} · ${v.freshness||'UNKNOWN'} · MMSI ${v.mmsi||'N/A'} · ${sog} · ${cog} · ${hdg} · status ${v.nav_status??'N/A'} · destination ${v.destination||'N/A'} · updated ${v.last_seen_utc||'N/A'}`;const m=addClickableMarker(v.name||`MMSI ${v.mmsi}`,v.lat,v.lon,el,extra);if(m)state.markers.vessel.push(m)})}
+function renderReferenceMarkers(){clearMarkers('points');if(!state.mapReady)return;state.locations.filter(x=>x.id!=='map-custom'&&validPoint(x)).forEach(p=>{const m=addClickableMarker(p.name,p.lat,p.lon,markerEl('marker-point'),`${p.kind||'REFERENCE'} · ${p.source||'Project reference'}${p.routing_eligible?' · navigable cell':' · reference only'}`);if(m)state.markers.points.push(m)})}
+function renderGps(){clearMarkers('gps');if(!state.mapReady||!state.gps)return;const el=markerEl('gps-marker'),extra=`Browser GPS · accuracy ±${Math.round(state.gps.accuracy||0)} m · updated ${new Date(state.gps.timestamp).toLocaleTimeString()}`;setSingleMarker('gps',addClickableMarker('Current Position',state.gps.lat,state.gps.lon,el,extra))}
+function renderOrigin(){clearMarkers('origin');if(!state.mapReady||!state.origin)return;const el=markerEl('marker-point');el.style.background='#158a67';setSingleMarker('origin',addClickableMarker(state.origin.name||'Route Start',state.origin.lat,state.origin.lon,el,`START · ${state.origin.source||'operator selection'}`))}
+function renderDestination(){clearMarkers('destination');if(!state.mapReady||!state.destination)return;setSingleMarker('destination',addClickableMarker(state.destination.name||'Destination',state.destination.lat,state.destination.lon,markerEl('marker-destination'),`DESTINATION · ${state.destination.source||'operator selection'}`))}
+
+function geolocationSecure(){return window.isSecureContext||['localhost','127.0.0.1','::1'].includes(location.hostname)}
+function gpsErrorMessage(err){if(!geolocationSecure())return'GPS requires HTTPS or localhost. Use the HTTPS URL of your deployed site for public/mobile access.';if(!err)return'Browser location could not be acquired.';if(err.code===1)return'Permission denied. Allow Location in browser site settings, then try again.';if(err.code===2)return'Location unavailable. Check device location services and network/GPS availability.';if(err.code===3)return'GPS request timed out. Keep location services enabled and try again.';return err.message||'Browser location could not be acquired.'}
+function setGpsStatus(text,error=false){q('gpsSummary').textContent=text;q('mapGpsText').textContent=error?'GPS unavailable':text.startsWith('Location acquired')?'GPS acquired':state.gpsMode==='LIVE'?'GPS live':'GPS idle';q('gpsError').textContent=error?text:'';q('gpsError').classList.toggle('show',error)}
+function onGpsPosition(pos,mode){const c=pos.coords;if(!Number.isFinite(c.latitude)||!Number.isFinite(c.longitude)){setGpsStatus('Location unavailable: browser returned invalid coordinates.',true);return}state.gps={lat:Number(c.latitude),lon:Number(c.longitude),accuracy:Number.isFinite(c.accuracy)?Number(c.accuracy):null,heading:Number.isFinite(c.heading)?Number(c.heading):null,speed:Number.isFinite(c.speed)?Number(c.speed):null,timestamp:pos.timestamp};state.gpsMode=mode;const accuracy=state.gps.accuracy==null?'accuracy not reported':`accuracy ±${Math.round(state.gps.accuracy)} m`;setGpsStatus(`Location acquired · ${fmtCoord(state.gps.lat,state.gps.lon)} · ${accuracy} · ${new Date(pos.timestamp).toLocaleTimeString()}`);renderGps();if(state.mapReady&&(mode==='SINGLE'||state.followGps)){state.map.easeTo({center:[state.gps.lon,state.gps.lat],zoom:Math.max(state.map.getZoom(),8),duration:700})}}
+function ensureGpsSupport(){if(!geolocationSecure()){setGpsStatus('GPS requires HTTPS or localhost. Use the HTTPS URL of your deployed site for public/mobile access.',true);return false}if(!('geolocation' in navigator)){setGpsStatus('This browser does not support geolocation.',true);return false}return true}
+function useGpsOnce(){if(!ensureGpsSupport())return;setGpsStatus('GPS STATUS — Searching…');navigator.geolocation.getCurrentPosition(p=>onGpsPosition(p,'SINGLE'),e=>setGpsStatus(gpsErrorMessage(e),true),{enableHighAccuracy:true,timeout:15000,maximumAge:10000})}
+function startGpsTracking(){if(!ensureGpsSupport())return;if(state.gpsWatchId!==null)navigator.geolocation.clearWatch(state.gpsWatchId);state.gpsMode='LIVE';setGpsStatus('GPS STATUS — Searching for live position…');state.gpsWatchId=navigator.geolocation.watchPosition(p=>onGpsPosition(p,'LIVE'),e=>setGpsStatus(gpsErrorMessage(e),true),{enableHighAccuracy:true,timeout:20000,maximumAge:10000})}
+function stopGpsTracking(){if(state.gpsWatchId!==null){navigator.geolocation.clearWatch(state.gpsWatchId);state.gpsWatchId=null}state.gpsMode='IDLE';setGpsStatus(state.gps?`GPS stopped · last fix ${fmtCoord(state.gps.lat,state.gps.lon)} · ${new Date(state.gps.timestamp).toLocaleTimeString()}`:'GPS stopped. No position acquired.')}
+function toggleFollowGps(){state.followGps=!state.followGps;syncFollowGpsButton();if(state.followGps){navigateTo('mapSection');if(state.gps&&state.mapReady)state.map.easeTo({center:[state.gps.lon,state.gps.lat],zoom:Math.max(state.map.getZoom(),8),duration:650});else useGpsOnce()}}
+function followGpsNow(){state.followGps=true;syncFollowGpsButton();if(state.gps&&state.mapReady){state.map.easeTo({center:[state.gps.lon,state.gps.lat],zoom:Math.max(state.map.getZoom(),8),duration:650});navigateTo('mapSection')}else useGpsOnce()}
+async function confirmGpsAsOrigin(){if(!state.gps){setGpsStatus('Acquire a GPS position first.',true);return}if(state.gps.lat>NORTH_LIMIT){q('areaWarning').textContent=`Current GPS ${fmtCoord(state.gps.lat,state.gps.lon)} is outside the Antarctic routing area and cannot be used as a marine route origin.`;return}await validateAndSetPoint('origin',{name:'Current Position',lat:state.gps.lat,lon:state.gps.lon,source:'Browser GPS',coordinate_precision:state.gps.accuracy==null?'Browser did not report accuracy':`Reported accuracy ±${Math.round(state.gps.accuracy)} m`})}
+
+function locationInfoHtml(loc){if(!loc)return'<div class="location-name">No location selected</div>';const eligible=loc.routing_eligible===true?'<span style="color:var(--green)">Validated marine cell</span>':loc.routing_eligible===false?'<span style="color:var(--amber)">Reference coordinate — not a validated marine cell</span>':'<span>Custom validated point</span>';return `<div class="location-name">${esc(loc.name||'Selected point')}</div><div class="location-meta">${esc(fmtCoord(loc.lat,loc.lon))}<br>Source: ${esc(loc.source||'Operator map selection')}<br>Precision: ${esc(loc.coordinate_precision||'WGS84 map coordinate')}<br>${eligible}${loc.routing_note?`<br>${esc(loc.routing_note)}`:''}</div>`}
+  function fillLocationSelect(id) {
+    const sel = q(id);
+
+    sel.innerHTML =
+      '<option value="">Select location...</option>';
+
+    state.locations.forEach(loc => {
+      const option = document.createElement('option');
+
+      option.value = loc.id;
+
+      if (
+        loc.routing_mode ===
+        'NEAREST_VALIDATED_MARINE_ACCESS'
+      ) {
+        option.textContent =
+          `${loc.name} — confirmed marine route`;
+      }
+      else if (
+        loc.routing_mode ===
+        'DIRECT_VALIDATED_REFERENCE'
+      ) {
+        option.textContent =
+          `${loc.name} — confirmed route`;
+      }
+      else if (
+        loc.routing_eligible === false
+      ) {
+        option.textContent =
+          `${loc.name} — reference only`;
+      }
+      else {
+        option.textContent = loc.name;
+      }
+
+      sel.appendChild(option);
+    });
+  }
+async function loadLocations(){const d=await getJson('/api/locations/antarctica');state.locations=d.locations||[];fillLocationSelect('startPreset');fillLocationSelect('destinationPreset');q('startPreset').addEventListener('change',()=>selectNamedLocation('origin',q('startPreset').value));q('destinationPreset').addEventListener('change',()=>selectNamedLocation('destination',q('destinationPreset').value));renderReferenceMarkers()}
+function selectNamedLocation(kind, id) {
+
+    invalidateRoute(
+        kind === 'origin'
+            ? 'Start changed'
+            : 'Destination changed'
+    );
+
+
+    const loc = state.locations.find(
+        item => item.id === id
+    );
+
+
+    if (!loc) {
+
+        if (kind === 'origin') {
+
+            state.origin = null;
+
+            if (q('startLocationInfo')) {
+                q('startLocationInfo').innerHTML =
+                    locationInfoHtml(null);
+            }
+        }
+
+        else {
+
+            state.destination = null;
+
+            if (q('destinationLocationInfo')) {
+                q('destinationLocationInfo').innerHTML =
+                    locationInfoHtml(null);
+            }
+        }
+
+        return;
+    }
+
+
+    /*
+     * Some Antarctic points are reference-only stations
+     * or no-data locations. Do not waste time routing to
+     * them unless a verified marine access point exists.
+     */
+
+    if (loc.routing_eligible === false) {
+
+        const message =
+            `${loc.name} is reference-only. ` +
+            `No verified CMEMS + NSIDC marine access point was found. ` +
+            `Use Pick on Map and select a nearby validated ocean cell.`;
+
+        if (kind === 'origin') {
+
+            state.origin = null;
+
+            if (q('startLocationInfo')) {
+                q('startLocationInfo').innerHTML =
+                    `<div class="location-name">${esc(loc.name)}</div>` +
+                    `<div class="location-meta">${esc(message)}</div>`;
+            }
+        }
+
+        else {
+
+            state.destination = null;
+
+            if (q('destinationLocationInfo')) {
+                q('destinationLocationInfo').innerHTML =
+                    `<div class="location-name">${esc(loc.name)}</div>` +
+                    `<div class="location-meta">${esc(message)}</div>`;
+            }
+        }
+
+        if (q('areaWarning')) {
+            q('areaWarning').textContent =
+                message;
+        }
+
+        setAnalysis(
+            'REFERENCE-ONLY LOCATION — PICK A NEARBY OCEAN CELL',
+            'error'
+        );
+
+        return;
+    }
+
+
+    const routeLat = Number(
+        loc.route_lat ?? loc.lat
+    );
+
+    const routeLon = normLon(
+        Number(
+            loc.route_lon ?? loc.lon
+        )
+    );
+
+
+    if (
+        !Number.isFinite(routeLat)
+        ||
+        !Number.isFinite(routeLon)
+    ) {
+
+        const message =
+            `${loc.name} does not have valid routing coordinates.`;
+
+        if (q('areaWarning')) {
+            q('areaWarning').textContent =
+                message;
+        }
+
+        setAnalysis(
+            message,
+            'error'
+        );
+
+        return;
+    }
+
+
+    const point = {
+        ...loc,
+
+        lat:
+            routeLat,
+
+        lon:
+            routeLon,
+
+        reference_lat:
+            Number(
+                loc.reference_lat ?? loc.lat
+            ),
+
+        reference_lon:
+            Number(
+                loc.reference_lon ?? loc.lon
+            ),
+
+        route_anchor_distance_km:
+            Number(
+                loc.route_anchor?.distance_km ?? 0
+            )
+    };
+
+
+    if (kind === 'origin') {
+
+        state.origin =
+            point;
+
+        if (q('originLat')) {
+            q('originLat').value =
+                point.lat.toFixed(6);
+        }
+
+        if (q('originLon')) {
+            q('originLon').value =
+                point.lon.toFixed(6);
+        }
+
+        if (q('startLocationInfo')) {
+            q('startLocationInfo').innerHTML =
+                locationInfoHtml(point);
+        }
+
+        renderOrigin();
+
+        updateNearby();
+    }
+
+    else {
+
+        state.destination =
+            point;
+
+        if (q('destinationLat')) {
+            q('destinationLat').value =
+                point.lat.toFixed(6);
+        }
+
+        if (q('destinationLon')) {
+            q('destinationLon').value =
+                point.lon.toFixed(6);
+        }
+
+        if (q('destinationLocationInfo')) {
+            q('destinationLocationInfo').innerHTML =
+                locationInfoHtml(point);
+        }
+
+        renderDestination();
+    }
+
+
+    if (q('areaWarning')) {
+
+        if (
+            loc.routing_mode ===
+            'NEAREST_VALIDATED_MARINE_ACCESS'
+        ) {
+
+            q('areaWarning').textContent =
+                `${loc.name}: routing uses nearest verified marine access point ` +
+                `${Number(loc.route_anchor?.distance_km ?? 0).toFixed(1)} km ` +
+                `from the reference coordinate.`;
+        }
+
+        else if (
+            loc.routing_mode ===
+            'DIRECT_VALIDATED_REFERENCE'
+        ) {
+
+            q('areaWarning').textContent =
+                `${loc.name}: selected coordinate is already a validated marine route point.`;
+        }
+
+        else {
+
+            q('areaWarning').textContent =
+                `Selected ${loc.name}: ${fmtCoord(point.lat, point.lon)}`;
+        }
+    }
+
+
+    setAnalysis(
+        'VALID ROUTE POINT SELECTED',
+        'ok'
+    );
+}
+function beginMapPick(kind){state.pickMode=kind;q('mapClickTag').textContent=`Selection mode: PICK ${kind==='origin'?'START':'DESTINATION'}`;q('mapInstruction').textContent=`Click a CMEMS/NSIDC-validated navigable ocean cell for the route ${kind==='origin'?'start':'destination'}. Land and no-data cells will be rejected.`;q('pickStartMapBtn').classList.toggle('picker-active',kind==='origin');q('pickDestMapBtn').classList.toggle('picker-active',kind==='destination');navigateTo('mapSection')}
+async function validateAndSetPoint(kind,p){checkAntarctic(p,kind==='origin'?'Start':'Destination');setAnalysis('VALIDATING NAVIGATION SURFACE…','busy');const check=await getJson(`/api/navigation/surface-check?lat=${encodeURIComponent(p.lat)}&lon=${encodeURIComponent(p.lon)}`);if(!check.navigable){setAnalysis('INVALID LAND / COAST / NO-DATA SELECTION','error');q('mapStatusText').textContent=check.message;throw new Error('Selected coordinate is not a verified navigable CMEMS/NSIDC ocean cell. Choose another point.')}const nearest=check.nearest_location;const name=p.name||((nearest&&nearest.distance_km<=150)?`Near ${nearest.name}`:'Map-selected ocean point');invalidateRoute(`${kind==='origin'?'Start':'Destination'} changed`);const result={name,lat:Number(p.lat),lon:Number(p.lon),source:p.source||check.source,coordinate_precision:p.coordinate_precision||check.coordinate_precision,routing_eligible:true,routing_note:`Validated by ${check.source}${nearest?`; nearest reference ${nearest.name} (${nearest.distance_km} km)`:''}`};if(kind==='origin'){state.origin=result;q('startPreset').value='';q('originLat').value=result.lat.toFixed(6);q('originLon').value=result.lon.toFixed(6);q('startLocationInfo').innerHTML=locationInfoHtml(result);renderOrigin();updateNearby()}else{state.destination=result;q('destinationPreset').value='';q('destinationLat').value=result.lat.toFixed(6);q('destinationLon').value=result.lon.toFixed(6);q('destinationLocationInfo').innerHTML=locationInfoHtml(result);renderDestination()}setAnalysis('VALID NAVIGABLE OCEAN CELL','ok');q('mapStatusText').textContent=`${kind==='origin'?'Start':'Destination'} accepted · ${fmtCoord(result.lat,result.lon)}`;return result}
+async function handleMapClick(e){if(state.suppressNextMapClick){state.suppressNextMapClick=false;return}const routeLayers=Object.values(ROUTE_LAYER_IDS).filter(id=>state.map?.getLayer(id));if(routeLayers.length&&state.map?.queryRenderedFeatures(e.point,{layers:routeLayers}).length)return;const kind=state.pickMode||'destination';try{await validateAndSetPoint(kind,{lat:Number(e.lngLat.lat),lon:Number(e.lngLat.lng),source:'Map click · validated by backend'});state.pickMode=null;q('mapClickTag').textContent='Selection mode: none';q('pickStartMapBtn').classList.remove('picker-active');q('pickDestMapBtn').classList.remove('picker-active');q('mapInstruction').textContent=kind==='destination'?'Destination selected from a verified navigable ocean cell. Click another ocean cell to replace it, or use Pick Start.':'Start selected from a verified navigable ocean cell.'}catch(err){q('mapStatusText').textContent=err.message}}
+async function setManualPoint(kind){const p={name:'Manual coordinate',lat:Number(q(kind==='origin'?'originLat':'destinationLat').value),lon:Number(q(kind==='origin'?'originLon':'destinationLon').value),source:'OPERATOR ENTERED COORDINATE',coordinate_precision:'As entered by operator'};try{await validateAndSetPoint(kind,p)}catch(e){q('areaWarning').textContent=e.message}}
+
+async function loadHealth(){
+  try{const d=await getJson('/api/system/health');state.health=d;if(!d.navigation_surface?.available)q('areaWarning').textContent='Required CMEMS/NSIDC navigation surface is unavailable. NAV-X will return NO VERIFIED ROUTE AVAILABLE rather than draw a synthetic route.';renderHomeStatus();renderDataObservatory()}
+  catch(_){state.health=null;renderHomeStatus();renderDataObservatory()}
+}
+async function loadProvenance(){
+  try{const d=await getJson('/api/system/provenance');state.provenance=d;const src=d.sources||{},us=src.usnic||{},cm=src.cmems||{},ns=src.nsidc||{},er=src.era5||{};q('provUsnic').textContent=`USNIC · REAL OBSERVATION · observed ${us.observation_date||'date unavailable'}`;q('provCmems').textContent=`CMEMS · ${cm.status||'DATA UNAVAILABLE'} · ${cm.temporal_coverage||'date unavailable'}`;q('provNsidc').textContent=`NSIDC · ${ns.status||'DATA UNAVAILABLE'} · ${ns.date||'date unavailable'}`;q('provEra5').textContent=`ERA5 / ECMWF · ${er.status||'DATA UNAVAILABLE'} · ${er.temporal_coverage||'date unavailable'}`;renderDataObservatory();renderHomeStatus()}
+  catch(_){state.provenance=null;q('provCmems').textContent='CMEMS · provenance unavailable';q('provNsidc').textContent='NSIDC · provenance unavailable';q('provEra5').textContent='ERA5 / ECMWF · provenance unavailable';renderDataObservatory();renderHomeStatus()}
+}
+function icebergSeries(id){const c=String(id||'').charAt(0).toUpperCase();return{A:'A-series',B:'B-series',C:'C-series',D:'D-series'}[c]||'Other USNIC series'}
+async function loadIcebergs() {
+
+  /*
+   * CURRENT NAVIGATION LAYER
+   *
+   * This function intentionally continues to use
+   * /api/data/icebergs.
+   *
+   * state.icebergs therefore contains ONLY the current
+   * official USNIC navigation observations.
+   *
+   * Historical observations are never inserted into this
+   * array and therefore cannot accidentally become hazards.
+   */
+
+  try {
+
+    const d = await getJson(
+      '/api/data/icebergs'
+    );
+
+
+    state.icebergMeta = d;
+
+
+    state.icebergs = (
+      d.icebergs?.features || []
+    )
+      .map(f => {
+
+        const p =
+          f.properties || {};
+
+        const c =
+          f.geometry?.coordinates || [];
+
+
+        return {
+
+          id:
+            p.id ||
+            p.iceberg_id ||
+            'UNKNOWN',
+
+          lat:
+            Number(
+              c[1]
+            ),
+
+          lon:
+            normLon(
+              Number(
+                c[0]
+              )
+            ),
+
+          observed:
+            p.date_observed ||
+            d.timestamp ||
+            'N/A',
+
+          age:
+            Number(
+              p.observation_age_hours
+            ),
+
+          lengthNm:
+            p.length_nm == null
+              ? null
+              : Number(
+                  p.length_nm
+                ),
+
+          widthNm:
+            p.width_nm == null
+              ? null
+              : Number(
+                  p.width_nm
+                ),
+
+          uncertaintyKm:
+            p.position_uncertainty_km == null
+              ? null
+              : Number(
+                  p.position_uncertainty_km
+                ),
+
+          source:
+            p.source ||
+            d.source ||
+            'USNIC',
+
+          coordinatePrecision:
+            p.coordinate_precision ||
+            'As published by USNIC',
+
+          positionType:
+            p.position_type ||
+            'OFFICIAL_OBSERVATION'
+        };
+
+      })
+      .filter(
+        validPoint
+      );
+
+
+    renderIceMarkers();
+
+    populateIcebergDetailSelect();
+
+    renderHomeStatus();
+
+    updateRouteDependentPanels();
+
+
+    if (
+      state.origin
+    ) {
+
+      updateNearby();
+    }
+
+  }
+
+  catch (e) {
+
+    console.error(
+      'Current USNIC iceberg feed unavailable:',
+      e
+    );
+
+
+    state.icebergs = [];
+
+    state.icebergMeta = null;
+
+
+    renderIceMarkers();
+
+    populateIcebergDetailSelect();
+
+    renderHomeStatus();
+
+    updateRouteDependentPanels();
+  }
+}
+
+function aisScanReference(){for(const p of [state.origin,state.destination,(state.gps&&state.gps.lat<=NORTH_LIMIT)?state.gps:null])if(p)return p;if(state.mapReady){const c=state.map.getCenter();if(c&&Number(c.lat)<=NORTH_LIMIT)return{lat:Number(c.lat),lon:normLon(Number(c.lng))}}return null}
+async function loadVessels(){try{const ref=aisScanReference(),url=ref?`/api/data/vessels?lat=${encodeURIComponent(ref.lat)}&lon=${encodeURIComponent(ref.lon)}&radius_nm=50`:'/api/data/vessels';const d=await getJson(url);state.vessels=(Array.isArray(d.vessels)?d.vessels:[]).map(v=>({...v,lat:Number(v.lat),lon:normLon(Number(v.lon))})).filter(validPoint);q('aisSourceTitle').textContent=d.provider||'AIS provider';q('provAis').textContent=state.vessels.length?`${d.provider||'AIS provider'} · RECEIVED POSITIONS ONLY · newest ${d.newest_position_utc||d.last_update_utc||'timestamp per vessel'}`:`${d.provider||'AIS provider'} · ${d.status||'NO CURRENT AIS POSITIONS RECEIVED'}`;q('aisSourceText').textContent=state.vessels.length?`${state.vessels.length} received position(s) · LIVE ${d.live_count||0}, RECENT ${d.recent_count||0}, STALE ${d.stale_count||0}. AIS coverage depends on terrestrial/satellite reception.`:`NO CURRENT AIS POSITIONS RECEIVED · ${d.coverage_note||d.required_action||'AIS feed unavailable.'}`;populateVesselSelect();renderVesselTable();renderVesselMarkers();renderHomeStatus();updateRouteDependentPanels()}catch(e){state.vessels=[];q('aisSourceTitle').textContent='AIS unavailable';q('provAis').textContent='AIS · DATA UNAVAILABLE';q('aisSourceText').textContent='No current AIS data received.';populateVesselSelect();renderVesselTable();renderVesselMarkers();renderHomeStatus();updateRouteDependentPanels()}}
+function populateVesselSelect(){const sel=q('vesselSelect');const current=sel.value;sel.innerHTML='<option value="">No AIS vessel selected</option>';state.vessels.forEach(v=>{const o=document.createElement('option');o.value=String(v.mmsi||'');o.textContent=`${v.name||'Unnamed'} · MMSI ${v.mmsi||'N/A'} · ${v.freshness||'UNKNOWN'}`;sel.appendChild(o)});if([...sel.options].some(o=>o.value===current))sel.value=current}
+async function useSelectedVesselAsOrigin(){const m=q('vesselSelect').value,v=state.vessels.find(x=>String(x.mmsi)===String(m));if(!v){q('areaWarning').textContent='Select a genuine AIS vessel first.';return}try{await validateAndSetPoint('origin',{name:v.name||`MMSI ${v.mmsi}`,lat:v.lat,lon:v.lon,source:v.source||'AIS',coordinate_precision:v.data_quality||'AIS reported position'});q('areaWarning').textContent=`Route start set from received AIS position for ${v.name||v.mmsi}.` }catch(e){q('areaWarning').textContent=e.message}}
+function renderIcebergTable() {
+
+  const search = (
+    q('icebergSearch')
+      ?.value || ''
+  )
+    .trim()
+    .toLowerCase();
+
+
+  const catalog =
+    state.historyCatalog
+      ?.catalog || [];
+
+
+  const rows =
+    catalog.filter(item => {
+
+      if (
+        !search
+      ) {
+
+        return true;
+      }
+
+
+      const fields = [
+
+        item.iceberg_id,
+
+        item.current_status,
+
+        ...(
+          Array.isArray(
+            item.sources
+          )
+            ? item.sources
+            : []
+        )
+
+      ];
+
+
+      return fields.some(
+        value =>
+          String(
+            value || ''
+          )
+            .toLowerCase()
+            .includes(
+              search
+            )
+      );
+    });
+
+
+  const table =
+    q('icebergTable');
+
+
+  if (
+    !table
+  ) {
+
+    return;
+  }
+
+
+  if (
+    !state.historyCatalog
+  ) {
+
+    table.innerHTML =
+      (
+        '<tr>' +
+        '<td colspan="8">' +
+        'LOADING UNIFIED ICEBERG DATABASE…' +
+        '</td>' +
+        '</tr>'
+      );
+
+    return;
+  }
+
+
+  table.innerHTML =
+    rows.length
+
+      ? rows.map(item => {
+
+          const id =
+            String(
+              item.iceberg_id ||
+              'UNKNOWN'
+            );
+
+
+          const status =
+            String(
+              item.current_status ||
+              'UNKNOWN'
+            );
+
+
+          let statusText =
+            status;
+
+
+          let statusClass =
+            '';
+
+
+          if (
+            status ===
+            'OFFICIAL_CURRENT'
+          ) {
+
+            statusText =
+              'OFFICIAL CURRENT';
+
+            statusClass =
+              'risk-low';
+          }
+
+
+          else if (
+            status ===
+            'SUPPLEMENTAL_CURRENT'
+          ) {
+
+            statusText =
+              'SUPPLEMENTAL CURRENT';
+
+            statusClass =
+              'risk-moderate';
+          }
+
+
+          else if (
+            status ===
+            'HISTORICAL_ONLY'
+          ) {
+
+            statusText =
+              'HISTORICAL ONLY';
+          }
+
+
+          const first =
+            item.first_observed_at
+              ? String(
+                  item.first_observed_at
+                ).slice(
+                  0,
+                  10
+                )
+              : 'N/A';
+
+
+          const latest =
+            item.last_observed_at
+              ? String(
+                  item.last_observed_at
+                ).slice(
+                  0,
+                  10
+                )
+              : 'N/A';
+
+
+          const positions =
+            Number(
+              item.observation_count ||
+              0
+            );
+
+
+          const sources =
+            Array.isArray(
+              item.sources
+            )
+              ? item.sources.join(
+                  ', '
+                )
+              : 'N/A';
+
+
+          const history =
+            item.has_historical_track
+              ? 'AVAILABLE'
+              : 'NO HISTORICAL TRACK';
+
+
+          const currentMapButton =
+            item.currently_in_usnic_database
+
+              ? `
+                <button
+                  class="btn btn-secondary btn-small"
+                  onclick="focusIceberg('${esc(id)}')"
+                >
+                  Current Map
+                </button>
+              `
+
+              : '';
+
+
+          return `
+
+            <tr>
+
+              <td>
+
+                <strong>
+                  ${esc(id)}
+                </strong>
+
+                <br>
+
+                <span class="hint">
+                  ${esc(
+                    icebergSeries(id)
+                  )}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <strong class="${statusClass}">
+                  ${esc(statusText)}
+                </strong>
+
+                ${
+                  item.currently_in_usnic_database &&
+                  item.currently_in_byu_scp_database
+
+                    ? `
+                      <br>
+                      <span class="hint">
+                        Also in BYU/SCP current data
+                      </span>
+                    `
+
+                    : ''
+                }
+
+              </td>
+
+
+              <td>
+                ${esc(first)}
+              </td>
+
+
+              <td>
+                ${esc(latest)}
+              </td>
+
+
+              <td>
+
+                <strong>
+                  ${positions.toLocaleString()}
+                </strong>
+
+              </td>
+
+
+              <td>
+                ${esc(sources)}
+              </td>
+
+
+              <td>
+                ${esc(history)}
+              </td>
+
+
+              <td>
+
+                <div
+                  class="actions"
+                  style="margin:0"
+                >
+
+                  ${currentMapButton}
+
+
+                  <button
+                    class="btn btn-secondary btn-small"
+                    onclick="viewHistoricalTrack('${esc(id)}')"
+                  >
+                    Full Track
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          `;
+
+        }).join('')
+
+      : (
+          '<tr>' +
+          '<td colspan="8">' +
+          'NO MATCHING ICEBERG RECORDS' +
+          '</td>' +
+          '</tr>'
+        );
+}
+
+function renderVesselTable(){const s=(q('vesselSearch').value||'').trim().toLowerCase(),rows=state.vessels.filter(v=>!s||[v.name,v.mmsi,v.imo,v.call_sign,v.ship_type].some(x=>String(x||'').toLowerCase().includes(s)));q('vesselTable').innerHTML=rows.length?rows.map(v=>`<tr><td><strong>${esc(v.name||'N/A')}</strong><br><span class="hint">${esc(v.ship_type||'N/A')}</span></td><td>MMSI ${esc(v.mmsi||'N/A')}<br>IMO ${esc(v.imo||'N/A')}<br>${esc(v.call_sign||'N/A')}</td><td>${esc(fmtCoord(v.lat,v.lon))}</td><td>${Number.isFinite(Number(v.sog_knots))?Number(v.sog_knots).toFixed(1)+' kn':'N/A'} / ${Number.isFinite(Number(v.cog_deg))?Number(v.cog_deg).toFixed(0)+'°':'N/A'} / ${Number.isFinite(Number(v.heading_deg))?Number(v.heading_deg).toFixed(0)+'°':'N/A'}</td><td>Status ${v.nav_status??'N/A'}<br>Dest ${esc(v.destination||'N/A')}</td><td><strong class="${v.freshness==='LIVE'?'risk-low':v.freshness==='STALE'?'risk-high':'risk-moderate'}">${esc(v.freshness||'OFFLINE')}</strong><br>${esc(v.last_seen_utc||'N/A')}<br><span class="hint">${Number.isFinite(Number(v.received_age_seconds))?Math.round(v.received_age_seconds)+' s ago':'N/A'}</span></td><td>${esc(v.source||'AIS')}<br><span class="hint">${esc(v.data_quality||'N/A')}</span></td><td><button class="btn btn-secondary btn-small" onclick="focusVessel('${esc(String(v.mmsi||''))}')">Center</button></td></tr>`).join(''):'<tr><td colspan="8">NO CURRENT AIS POSITIONS RECEIVED</td></tr>'}
+function focusIceberg(id){const x=state.icebergs.find(i=>i.id===id);if(x){navigateTo('mapSection');setTimeout(()=>setView(x.lat,x.lon,7),100)}}
+function focusVessel(mmsi){const x=state.vessels.find(v=>String(v.mmsi)===String(mmsi));if(x){navigateTo('mapSection');setTimeout(()=>setView(x.lat,x.lon,8),100)}}
+function updateNearby(){if(!state.origin||!validPoint(state.origin))return;const r=Math.max(100,Number(q('searchRadius').value||600));state.nearby=state.icebergs.map(x=>({...x,distance:hav(state.origin.lat,state.origin.lon,x.lat,x.lon)})).filter(x=>x.distance<=r).sort((a,b)=>a.distance-b.distance);q('nearbyCountTag').textContent=String(state.nearby.length);q('nearbyList').innerHTML=state.nearby.length?state.nearby.slice(0,20).map(x=>`<div class="nearby-item"><div class="nearby-top"><span>${esc(x.id)}</span><span>${x.distance.toFixed(1)} km</span></div><div class="nearby-meta">USNIC REAL OBSERVATION · ${esc(fmtCoord(x.lat,x.lon))} · observed ${esc(x.observed)}</div></div>`).join(''):'<div class="empty">No official USNIC iceberg is inside the selected radius.</div>'}
+function directRouteSeed(steps=32){if(!state.origin||!state.destination)return[];const a=state.origin,b=state.destination,out=[];for(let i=0;i<=steps;i++){const t=i/steps,dl=normLon(Number(b.lon)-Number(a.lon));out.push({lat:Number(a.lat)+(Number(b.lat)-Number(a.lat))*t,lon:normLon(Number(a.lon)+dl*t)})}return out}
+function routeProximityInfo(pt,route){if(!pt||!route?.length)return{distance:Infinity,position:0};let best=Infinity,idx=0;for(let i=0;i<route.length;i++){const r=route[i],d=hav(Number(pt.latitude),Number(pt.longitude),Number(r.lat),Number(r.lon));if(d<best){best=d;idx=i}}return{distance:best,position:route.length>1?idx/(route.length-1):0}}
+function forecastTargetsForPath(path,limit=MAX_INITIAL_FORECASTS,excludeIds=new Set()){const corridor=(Array.isArray(path)&&path.length>1)?path:directRouteSeed();const radius=Math.max(100,Number(q('searchRadius').value||600));const candidates=state.icebergs.map(x=>{const prox=routeProximityInfo({latitude:x.lat,longitude:x.lon},corridor);return{...x,routeDistance:prox.distance,routePosition:prox.position}}).filter(x=>x.routeDistance<=radius&&!excludeIds.has(String(x.id).toUpperCase())).sort((a,b)=>a.routeDistance-b.routeDistance);if(candidates.length<=limit)return candidates;const chosen=[],used=new Set();const bins=Math.min(4,limit);for(let b=0;b<bins;b++){const lo=b/bins,hi=(b+1)/bins;const c=candidates.find(x=>x.routePosition>=lo&&(b===bins-1?x.routePosition<=hi:x.routePosition<hi)&&!used.has(String(x.id).toUpperCase()));if(c){chosen.push(c);used.add(String(c.id).toUpperCase())}}for(const c of candidates){if(chosen.length>=limit)break;const k=String(c.id).toUpperCase();if(!used.has(k)){chosen.push(c);used.add(k)}}return chosen.slice(0,limit)}
+function forecastCacheKey(x){return `${String(x.id).toUpperCase()}|${Number(x.lat).toFixed(5)}|${Number(x.lon).toFixed(5)}|${x.observed||''}`}
+async function forecastOne(x){const key=forecastCacheKey(x),cached=state.forecastCache.get(key);if(cached)return{...cached,observed:x,routeDistance:x.routeDistance};const p=new URLSearchParams({iceberg_id:x.id,lat:String(x.lat),lon:String(x.lon),observation_date:x.observed||''});try{const d=await postJson('/api/prediction/trajectory?'+p.toString(),null),f={iceberg_id:x.id,trajectory:d.trajectory||[],meta:d,observed:x,routeDistance:x.routeDistance};state.forecastCache.set(key,f);return f}catch(_){return null}}
+async function forecastNearby(path=null,merge=false,limit=MAX_INITIAL_FORECASTS){const existing=new Map((merge?state.forecasts:[]).map(f=>[String(f.iceberg_id).toUpperCase(),f])),targets=forecastTargetsForPath(path,limit,new Set(existing.keys()));if(!targets.length){if(!merge)state.forecasts=[];renderForecastAtHorizon();return state.forecasts}setAnalysis('CALCULATING ROUTE-WIDE ICEBERG TRAJECTORIES…','busy');const jobs=targets.map(forecastOne);for(const f of (await Promise.all(jobs)).filter(Boolean))existing.set(String(f.iceberg_id).toUpperCase(),f);state.forecasts=[...existing.values()];renderForecastAtHorizon();return state.forecasts}
+function forecastMinDistanceToRoute(f,route){const pts=[];if(f?.observed)pts.push({latitude:f.observed.lat,longitude:f.observed.lon});for(const n of (f?.trajectory||[]))if(Number.isFinite(Number(n.latitude))&&Number.isFinite(Number(n.longitude)))pts.push(n);let best=Infinity;for(const p of pts)best=Math.min(best,minDistanceToRoute(p,route));return best}
+function departureIso() {
+
+  const value =
+    q('departureTime')?.value;
+
+  if (!value) {
+    return new Date().toISOString();
+  }
+
+  const parsed =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      parsed.getTime()
+    )
+  ) {
+    return new Date().toISOString();
+  }
+
+  return parsed.toISOString();
+}
+
+
+function routeDistanceKm() {
+
+  if (
+    !state.origin ||
+    !state.destination
+  ) {
+    return 0;
+  }
+
+  return hav(
+    state.origin.lat,
+    state.origin.lon,
+    state.destination.lat,
+    state.destination.lon
+  );
+}
+
+
+function adaptiveGridNodes(distanceKm) {
+
+  const distance =
+    Number(distanceKm || 0);
+
+  if (distance < 1000) {
+    return 60;
+  }
+
+  if (distance < 2500) {
+    return 90;
+  }
+
+  if (distance < 4500) {
+    return 120;
+  }
+
+  return 160;
+}
+
+
+function availableRouteFromResult(result) {
+
+  const routes =
+    Array.isArray(result?.routes)
+      ? result.routes
+      : [];
+
+  return (
+    routes.find(
+      route =>
+        route.profile === result.recommended_profile
+        &&
+        route.available !== false
+    )
+
+    ||
+
+    routes.find(
+      route =>
+        route.available !== false
+    )
+
+    ||
+
+    null
+  );
+}
+
+
+async function optimizeWithAdaptiveGrid(
+  payloadBuilder,
+  label = 'route'
+) {
+
+  const distance =
+    routeDistanceKm();
+
+  const baseGrid =
+    adaptiveGridNodes(distance);
+
+  const attempts = [
+    baseGrid,
+    Math.min(180, baseGrid + 30),
+    Math.min(220, baseGrid + 60)
+  ];
+
+  let lastResult =
+    null;
+
+  let lastError =
+    null;
+
+
+  for (const gridNodes of attempts) {
+
+    try {
+
+      setAnalysis(
+        (
+          `CALCULATING ${label.toUpperCase()} · ` +
+          `GRID ${gridNodes} · ` +
+          `${distance.toFixed(0)} KM`
+        ),
+        'busy'
+      );
+
+      const result =
+        await postJson(
+          '/api/navigation/optimize',
+          payloadBuilder(gridNodes)
+        );
+
+      result.route_search = {
+        mode:
+          label,
+
+        grid_nodes:
+          gridNodes,
+
+        route_distance_km:
+          distance,
+
+        adaptive:
+          true
+      };
+
+      lastResult =
+        result;
+
+      if (
+        availableRouteFromResult(result)
+      ) {
+        return result;
+      }
+    }
+
+    catch (error) {
+
+      lastError =
+        error;
+
+      if (
+        error.payload?.routes
+      ) {
+
+        lastResult = {
+          routes:
+            error.payload.routes,
+
+          recommended_profile:
+            error.payload.recommended_profile,
+
+          comparison_metrics:
+            error.payload.comparison_metrics || [],
+
+          route_search: {
+            mode:
+              label,
+
+            grid_nodes:
+              gridNodes,
+
+            route_distance_km:
+              distance,
+
+            adaptive:
+              true,
+
+            error:
+              error.message
+          }
+        };
+      }
+    }
+  }
+
+
+  if (
+    lastResult
+  ) {
+    return lastResult;
+  }
+
+
+  throw (
+    lastError ||
+    new Error(
+      'No verified route was returned by the routing engine.'
+    )
+  );
+}
+async function computeRoutes() {
+
+  try {
+
+    if (
+      !state.origin ||
+      !state.destination
+    ) {
+      throw new Error(
+        'Select both Start and Destination before calculating routes.'
+      );
+    }
+
+
+    checkAntarctic(
+      state.origin,
+      'Start'
+    );
+
+    checkAntarctic(
+      state.destination,
+      'Destination'
+    );
+
+
+    const speed =
+      Number(
+        q('shipSpeed').value
+      );
+
+    const safety =
+      Number(
+        q('safetyBuffer').value
+      );
+
+
+    if (
+      !Number.isFinite(speed)
+      ||
+      speed < 1
+      ||
+      speed > 70
+    ) {
+      throw new Error(
+        'Vessel speed must be a number between 1 and 70 km/h.'
+      );
+    }
+
+
+    if (
+      !Number.isFinite(safety)
+      ||
+      safety < 5
+      ||
+      safety > 150
+    ) {
+      throw new Error(
+        'Safety buffer must be between 5 and 150 km.'
+      );
+    }
+
+
+    const departure =
+      departureIso();
+
+
+    const directKm =
+      hav(
+        state.origin.lat,
+        state.origin.lon,
+        state.destination.lat,
+        state.destination.lon
+      );
+
+
+    if (
+      !Number.isFinite(directKm)
+      ||
+      directKm < 1
+    ) {
+      throw new Error(
+        'Start and Destination must be different navigable positions.'
+      );
+    }
+
+
+    invalidateRoute(
+      'New route calculation started'
+    );
+
+
+    setAnalysis(
+      'VALIDATING ROUTE INPUTS…',
+      'busy'
+    );
+
+
+    updateNearby();
+
+
+    function buildPayload(
+      gridNodes,
+      icebergs
+    ) {
+
+      return {
+        origin:
+          state.origin,
+
+        destination:
+          state.destination,
+
+        speed_kmh:
+          speed,
+
+        safety_threshold_km:
+          safety,
+
+        grid_nodes:
+          gridNodes,
+
+        icebergs:
+          icebergs || [],
+
+        vessel_type:
+          q('vesselType').value,
+
+        departure_utc:
+          departure
+      };
+    }
+
+
+    /*
+     * Stage 1:
+     * Route first with no iceberg forecast delay.
+     */
+
+    state.forecasts =
+      [];
+
+
+    state.routeResult =
+      await optimizeWithAdaptiveGrid(
+        gridNodes =>
+          buildPayload(
+            gridNodes,
+            []
+          ),
+        'surface route'
+      );
+
+
+    state.activeProfile =
+      state.routeResult.recommended_profile
+      ||
+      (
+        (
+          state.routeResult.routes || []
+        ).find(
+          route =>
+            route.available !== false
+        )?.profile
+      )
+      ||
+      null;
+
+
+    renderRouteResult();
+
+    renderAllRoutes(true);
+
+    drawRouteGraph();
+
+    updateRouteDependentPanels();
+
+    renderRouteComparisonTable();
+
+
+    const provisionalRoute =
+      routeByProfile(
+        state.activeProfile
+      );
+
+
+    if (
+      !provisionalRoute
+    ) {
+
+      setAnalysis(
+        'NO VERIFIED ROUTE AVAILABLE',
+        'error'
+      );
+
+      return;
+    }
+
+
+    /*
+     * Stage 2:
+     * Forecast only icebergs close to provisional route.
+     */
+
+    if (
+      provisionalRoute.route?.length
+    ) {
+
+      setAnalysis(
+        'ROUTE FOUND · REFINING ICEBERG HAZARDS…',
+        'busy'
+      );
+
+
+      await forecastNearby(
+        provisionalRoute.route,
+        false,
+        MAX_INITIAL_FORECASTS
+      );
+
+
+      if (
+        state.forecasts.length
+      ) {
+
+        state.routeResult =
+          await optimizeWithAdaptiveGrid(
+            gridNodes =>
+              buildPayload(
+                gridNodes,
+                state.forecasts
+              ),
+            'hazard refined route'
+          );
+
+
+        state.activeProfile =
+          state.routeResult.recommended_profile
+          ||
+          (
+            (
+              state.routeResult.routes || []
+            ).find(
+              route =>
+                route.available !== false
+            )?.profile
+          )
+          ||
+          state.activeProfile;
+
+
+        renderRouteResult();
+
+        renderAllRoutes(true);
+
+        renderForecastAtHorizon();
+
+        drawRouteGraph();
+
+        updateRouteDependentPanels();
+
+        renderRouteComparisonTable();
+      }
+    }
+
+
+    loadAiDecision();
+
+    setAnalysis(
+      'ANALYSIS COMPLETE',
+      'ok'
+    );
+
+  }
+
+  catch (error) {
+
+    state.routeResult =
+      error.payload?.routes
+
+        ? {
+            routes:
+              error.payload.routes,
+
+            comparison_metrics:
+              error.payload.comparison_metrics || []
+          }
+
+        : state.routeResult;
+
+
+    renderRouteResult();
+
+    renderAllRoutes(false);
+
+    drawRouteGraph();
+
+
+    setAnalysis(
+      (
+        String(error.message).includes('No ocean-safe')
+        ||
+        String(error.message).includes('No verified')
+      )
+
+        ? 'NO VERIFIED ROUTE AVAILABLE'
+
+        : `ROUTE ANALYSIS FAILED — ${error.message}`,
+      'error'
+    );
+
+
+    if (q('routeDecisionTitle')) {
+      q('routeDecisionTitle').textContent =
+        'NO VERIFIED ROUTE AVAILABLE';
+    }
+
+    if (q('routeDecisionText')) {
+      q('routeDecisionText').textContent =
+        error.message || String(error);
+    }
+
+    if (q('explainList')) {
+      q('explainList').innerHTML =
+        `<li>${esc(error.message || String(error))}</li>`;
+    }
+
+    if (q('mapStatusText')) {
+      q('mapStatusText').textContent =
+        error.message || String(error);
+    }
+  }
+}
+function routeByProfile(p){return(state.routeResult?.routes||[]).find(x=>x.profile===p&&x.available!==false)||null}
+function routeLabel(p){return{FASTEST:'ROUTE A — FASTEST',BALANCED:'ROUTE B — BALANCED',SAFEST:'ROUTE C — SAFEST AVAILABLE'}[p]||p}
+function selectProfile(p,fit=true){if(!routeByProfile(p))return;state.activeProfile=p;renderRouteResult();renderAllRoutes(false);drawRouteGraph();renderForecastAtHorizon();updateRouteDependentPanels();if(fit)fitSelectedRoute()}
+function riskClass(r){return'risk-'+String(r||'').toLowerCase()}
+function renderRouteResult(){const routes=state.routeResult?.routes||[],rec=state.routeResult?.recommended_profile;const active=routeByProfile(state.activeProfile)||routes.find(r=>r.available!==false);q('routeCards').innerHTML=routes.length?routes.map(r=>r.available===false?`<div class="route-card unavailable"><div class="route-name">${routeLabel(r.profile)}</div><div class="route-meta"><span>UNAVAILABLE</span><span>${esc(r.error||'No verified navigable path')}</span></div></div>`:`<div class="route-card ${r.profile===rec?'recommended':''} ${active&&r.profile===active.profile?'active':''}" onclick="selectProfile('${r.profile}')"><div class="route-name">${routeLabel(r.profile)}${r.profile===rec?' · RECOMMENDED UNDER CURRENT DATA':''}</div><div class="route-meta"><span>Distance <strong>${Number(r.distance_km).toFixed(1)} km</strong></span><span>Transit <strong>${formatDuration(r.eta_hours)}</strong></span><span>Risk <strong class="${riskClass(r.risk)}">${esc(r.risk||'INSUFFICIENT VERIFIED DATA')}${r.risk_score==null?'':` · ${r.risk_score}/100`}</strong></span><span>Iceberg clearance <strong>${r.min_clearance_km==null?'N/A':Number(r.min_clearance_km).toFixed(1)+' km'}</strong></span><span>CPA <strong>${r.minimum_cpa_km==null?'N/A':Number(r.minimum_cpa_km).toFixed(1)+' km'}</strong></span></div></div>`).join(''):'<div class="route-card unavailable"><div class="route-name">NO VERIFIED ROUTE DATA AVAILABLE</div></div>';
+  if(!active){q('selectedProfileTag').textContent='No route';['distanceValue','etaValue','bearingValue','riskValue','clearanceValue','cpaValue','tcaValue','hazardValue','seaIceValue','arrivalValue'].forEach(id=>q(id).textContent='--');return}
+  q('selectedProfileTag').textContent=routeLabel(active.profile);q('mapRouteTag').textContent=routeLabel(active.profile);q('distanceValue').textContent=`${Number(active.distance_km).toFixed(1)} km`;q('etaValue').textContent=formatDuration(active.eta_hours);q('bearingValue').textContent=active.initial_bearing_deg==null?'N/A':`${Number(active.initial_bearing_deg).toFixed(1)}°`;q('riskValue').textContent=active.risk||'INSUFFICIENT VERIFIED DATA';q('clearanceValue').textContent=active.min_clearance_km==null?'N/A':`${Number(active.min_clearance_km).toFixed(1)} km`;q('cpaValue').textContent=active.minimum_cpa_km==null?'N/A':`${Number(active.minimum_cpa_km).toFixed(1)} km`;q('tcaValue').textContent=formatUtc(active.tca_utc);q('hazardValue').textContent=String((active.hazards||[]).length);q('seaIceValue').textContent=active.sea_ice?.maximum_concentration_percent==null?'DATA UNAVAILABLE':`${Number(active.sea_ice.maximum_concentration_percent).toFixed(1)}%`;q('arrivalValue').textContent=formatUtc(active.arrival_utc);q('routeDecisionTitle').textContent='WHY THIS ROUTE?';q('routeDecisionText').textContent=state.routeResult.explanation||'Backend route analysis completed.';const why=active.explainability?.why||state.routeResult.recommended_why||[];q('explainList').innerHTML=why.length?why.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>INSUFFICIENT VERIFIED DATA for a route explanation.</li>'}
+function bindRouteHandlers(){if(state.routeHandlersBound||!state.mapReady)return;for(const [profile,id] of Object.entries(ROUTE_LAYER_IDS)){state.map.on('click',id,()=>{state.suppressNextMapClick=true;selectProfile(profile,true)});state.map.on('mouseenter',id,()=>state.map.getCanvas().style.cursor='pointer');state.map.on('mouseleave',id,()=>state.map.getCanvas().style.cursor='')}state.routeHandlersBound=true}
+function renderCpaMarker(route){clearMarkers('cpa');if(!state.mapReady||!route)return;const pts=(route.clearance_series||[]).filter(x=>Number.isFinite(Number(x.cpa_km))&&Number.isFinite(Number(x.vessel_lat))&&Number.isFinite(Number(x.vessel_lon)));if(!pts.length)return;const p=pts.reduce((a,b)=>Number(a.cpa_km)<=Number(b.cpa_km)?a:b);const el=markerEl('marker-point','CPA');el.style.width='30px';el.style.height='30px';el.style.background='#fff';el.style.color='#b64d4d';el.style.borderColor='#b64d4d';setSingleMarker('cpa',addClickableMarker(`Closest Point of Approach · ${route.profile}`,Number(p.vessel_lat),Number(p.vessel_lon),el,`Backend CPA ${Number(p.cpa_km).toFixed(1)} km · iceberg ${p.nearest_iceberg_id||'N/A'} · ${p.timestamp_utc||'N/A'}`))}
+function pointAtRouteFraction(path,fraction){if(!Array.isArray(path)||path.length<2)return null;const seg=[],total=path.slice(1).reduce((sum,p,i)=>{const d=hav(Number(path[i].lat),Number(path[i].lon),Number(p.lat),Number(p.lon));seg.push(d);return sum+d},0);if(!Number.isFinite(total)||total<=0)return null;const target=total*fraction;let walked=0;for(let i=0;i<seg.length;i++){const d=seg[i];if(walked+d>=target){const t=d?((target-walked)/d):0,a=path[i],b=path[i+1],dl=normLon(Number(b.lon)-Number(a.lon));return{lat:Number(a.lat)+(Number(b.lat)-Number(a.lat))*t,lon:normLon(Number(a.lon)+dl*t),distanceKm:target,totalKm:total}}walked+=d}const p=path[path.length-1];return{lat:Number(p.lat),lon:Number(p.lon),distanceKm:total,totalKm:total}}
+function renderRouteCheckpoints(route){clearMarkers('checkpoints');if(!state.mapReady||!state.layers.routes||!route?.route?.length)return;[.25,.5,.75].forEach((fraction,i)=>{const p=pointAtRouteFraction(route.route,fraction);if(!p)return;const el=document.createElement('div');el.className='marker-checkpoint';el.innerHTML=`<b>CP${i+1}</b><small>${esc(fmtCoord(p.lat,p.lon))}</small>`;el.addEventListener('click',e=>e.stopPropagation());const eta=Number.isFinite(Number(route.eta_hours))?formatDuration(Number(route.eta_hours)*fraction):'N/A';const extra=`Checkpoint ${i+1} · ${Math.round(fraction*100)}% of selected route · ${p.distanceKm.toFixed(1)} km from start · estimated elapsed time ${eta}`;const m=addClickableMarker(`Route Checkpoint ${i+1}`,p.lat,p.lon,el,extra);if(m)state.markers.checkpoints.push(m)})}
+function renderAllRoutes(autoFit=false){if(!state.mapReady)return;Object.values(ROUTE_LAYER_IDS).forEach(clearGeo);clearGeo('navx-hazards');clearMarkers('routeLabels');clearMarkers('checkpoints');clearMarkers('cpa');const routes=(state.routeResult?.routes||[]).filter(r=>r.available!==false&&Array.isArray(r.route)&&r.route.length>1);if(!state.layers.routes)return;routes.forEach(r=>{const selected=r.profile===state.activeProfile;setLine(ROUTE_LAYER_IDS[r.profile],r.route,{color:ROUTE_COLORS[r.profile],width:selected?7:4,opacity:selected?1:.62});const mid=r.route[Math.floor(r.route.length/2)];if(validPoint(mid)){const lab=markerEl('marker-route-label',routeLabel(r.profile).replace('ROUTE ','R'));const m=addClickableMarker(routeLabel(r.profile),mid.lat,mid.lon,lab,`Distance ${Number(r.distance_km).toFixed(1)} km · ${formatDuration(r.eta_hours)}`);if(m){lab.addEventListener('click',()=>selectProfile(r.profile,true));state.markers.routeLabels.push(m)}}});bindRouteHandlers();const active=routeByProfile(state.activeProfile);renderRouteCheckpoints(active);renderHazards(active);renderCpaMarker(active);if(autoFit)fitAllRoutes()}
+function renderHazards(route){clearGeo('navx-hazards');if(!state.mapReady||!state.layers.hazards||!route?.hazards?.length)return;const feats=route.hazards.map(h=>({type:'Feature',properties:{id:h.iceberg_id},geometry:{type:'Polygon',coordinates:[circlePolygon(Number(h.iceberg_lat),Number(h.iceberg_lon),Math.max(1,Number(h.uncertainty_radius_km||1)))]}}));ensureGeoSource('navx-hazards',{type:'FeatureCollection',features:feats});state.map.addLayer({id:'navx-hazards',type:'fill',source:'navx-hazards',paint:{'fill-color':'#b64d4d','fill-opacity':.15,'fill-outline-color':'#b64d4d'}})}
+function extendBounds(bounds,path){lineGeo(path).geometry.coordinates.forEach(c=>bounds.extend(c))}
+function fitAllRoutes(){if(!state.mapReady)return;const routes=(state.routeResult?.routes||[]).filter(r=>r.available!==false&&r.route?.length);if(!routes.length){q('mapStatusText').textContent='NO VERIFIED ROUTE DATA AVAILABLE';return}const b=new maplibregl.LngLatBounds();if(state.origin)b.extend([state.origin.lon,state.origin.lat]);if(state.destination)b.extend([state.destination.lon,state.destination.lat]);routes.forEach(r=>extendBounds(b,r.route));if(!b.isEmpty())state.map.fitBounds(b,{padding:{top:70,bottom:70,left:70,right:70},maxZoom:7,duration:700})}
+function fitSelectedRoute(){const r=routeByProfile(state.activeProfile);if(!state.mapReady||!r?.route?.length)return;const b=new maplibregl.LngLatBounds();extendBounds(b,r.route);if(!b.isEmpty())state.map.fitBounds(b,{padding:80,maxZoom:8,duration:650})}
+function clearRoute(){Object.values(ROUTE_LAYER_IDS).forEach(clearGeo);['navx-hazards','navx-forecast-lines'].forEach(clearGeo);clearMarkers('forecast');clearMarkers('routeLabels');clearMarkers('checkpoints');clearMarkers('cpa');state.routeResult=null;state.activeProfile=null;state.forecasts=[];state.aiDecision=null;renderRouteResult();renderAiDecision();q('routeDecisionTitle').textContent='WHY THIS ROUTE?';q('routeDecisionText').textContent='Analyze routes to see backend-calculated evidence.';q('explainList').innerHTML='<li>No route has been analyzed yet.</li>';q('mapRouteTag').textContent='Route: --';q('timeInsight').textContent='Observed positions are USNIC. Future positions are model forecasts/sensitivity envelopes.';setAnalysis('READY — choose validated start and destination points.');drawRouteGraph();updateRouteDependentPanels();renderRouteComparisonTable()}
+function invalidateRoute(reason='Planning input changed'){if(!state.routeResult&&!state.forecasts.length)return;clearRoute();setAnalysis(`INPUT CHANGED — ${reason}. Recalculate routes before using route metrics.`)}
+
+function nearestForecastPoint(f,h){const pts=f.trajectory||[];if(h===0)return f.observed?{latitude:f.observed.lat,longitude:f.observed.lon,horizon_hours:0}:null;if(!pts.length)return null;return pts.reduce((a,b)=>Math.abs(Number(a.horizon_hours||0)-h)<=Math.abs(Number(b.horizon_hours||0)-h)?a:b)}
+function minDistanceToRoute(pt,route){if(!pt||!route?.length)return Infinity;return Math.min(...route.map(r=>hav(Number(pt.latitude),Number(pt.longitude),Number(r.lat),Number(r.lon))))}
+function renderForecastAtHorizon(){clearMarkers('forecast');clearGeo('navx-forecast-lines');if(!state.mapReady||!state.layers.forecast||!state.forecasts.length)return;const h=state.forecastHorizon,route=routeByProfile(state.activeProfile);let closest=null;const lineFeats=[];state.forecasts.forEach(f=>{const traj=(f.trajectory||[]).filter(x=>Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)));const start=f.meta?.nowcast&&Number.isFinite(Number(f.meta.nowcast.latitude))&&Number.isFinite(Number(f.meta.nowcast.longitude))?{lat:Number(f.meta.nowcast.latitude),lon:Number(f.meta.nowcast.longitude)}:null;const fullPath=[...(start?[start]:[]),...traj.map(x=>({lat:Number(x.latitude),lon:Number(x.longitude)}))];if(fullPath.length>1)lineFeats.push(lineGeo(fullPath));traj.forEach(node=>{const nh=Number(node.horizon_hours||0),lat=Number(node.latitude),lon=normLon(Number(node.longitude)),activeNode=h>0&&Math.abs(nh-h)<.1,unc=Number.isFinite(Number(node.uncertainty_radius_km))?`${Number(node.uncertainty_radius_km).toFixed(1)} km P90 sensitivity spread`:'uncertainty N/A',speed=Number.isFinite(Number(node.drift_speed_ms))?`${Number(node.drift_speed_ms).toFixed(2)} m/s`:'speed N/A',bearing=Number.isFinite(Number(node.drift_bearing_deg))?`${Number(node.drift_bearing_deg).toFixed(0)}°`:'bearing N/A',quality=f.meta?.quality?.level||'UNVERIFIED';const el=markerEl(activeNode?'marker-forecast':'marker-forecast-node');const m=addClickableMarker(`Iceberg ${f.iceberg_id} +${nh}h`,lat,lon,el,`MODEL FORECAST · ${node.forecast_timestamp||'time N/A'} · drift ${speed} at ${bearing} · ${unc} · model quality ${quality} · navigation accuracy is not certified`);if(m)state.markers.forecast.push(m)});const p=nearestForecastPoint(f,h);if(!p)return;const lat=Number(p.latitude),lon=normLon(Number(p.longitude));if(!Number.isFinite(lat)||!Number.isFinite(lon))return;if(h===0){const obs=f.observed,extra=`USNIC REAL OBSERVATION · observed ${obs?.observed||'N/A'} · model track from this official fix remains visible through +72h`;const m=addClickableMarker(`Observed Iceberg ${f.iceberg_id}`,lat,lon,markerEl('marker-ice','◆'),extra);if(m)state.markers.forecast.push(m)}if(route){const d=minDistanceToRoute(p,route.route);if(!closest||d<closest.d)closest={id:f.iceberg_id,d}}});if(lineFeats.length){ensureGeoSource('navx-forecast-lines',{type:'FeatureCollection',features:lineFeats});state.map.addLayer({id:'navx-forecast-lines',type:'line',source:'navx-forecast-lines',paint:{'line-color':'#9d6a0d','line-width':2.4,'line-opacity':.82,'line-dasharray':[2,2]}})}const horizonText=h===0?'NOW / observed fixes':`+${h}h highlighted`;q('timeInsight').textContent=closest?`${horizonText}. Full +6h to +72h drift tracks remain visible. Closest highlighted iceberg ${closest.id} is approximately ${closest.d.toFixed(1)} km from the selected route.`:`${horizonText}. Full +6h to +72h model drift tracks remain visible across the route corridor.`}
+function updateTimeHorizon(){state.forecastHorizon=HORIZONS[Number(q('timeSlider').value)||0]||0;renderForecastAtHorizon()}
+
+async function loadScientificOverlays(){if(state.overlaysLoaded||!state.mapReady)return;state.overlaysLoaded=true;try{const [curr,wind,bounds]=await Promise.all([getJson('/app/overlays/currents.json'),getJson('/app/overlays/wind.json'),getJson('/app/overlays/sea_ice_bounds.json')]);const vectorFeatures=(data,kind)=>({type:'FeatureCollection',features:(data.vectors||[]).map(v=>({type:'Feature',geometry:{type:'Point',coordinates:[normLon(v.lon),Number(v.lat)]},properties:{u:Number(v.u),v:Number(v.v),kind}}))});ensureGeoSource('navx-currents',vectorFeatures(curr,'CMEMS'));state.map.addLayer({id:'navx-currents',type:'circle',source:'navx-currents',paint:{'circle-radius':3,'circle-color':'#147fa8','circle-opacity':.72}});ensureGeoSource('navx-wind',vectorFeatures(wind,'ERA5'));state.map.addLayer({id:'navx-wind',type:'circle',source:'navx-wind',paint:{'circle-radius':3,'circle-color':'#9d6a0d','circle-opacity':.72}});state.map.addSource('navx-seaice',{type:'image',url:'/app/overlays/sea_ice.png',coordinates:[[bounds.west,bounds.north],[bounds.east,bounds.north],[bounds.east,bounds.south],[bounds.west,bounds.south]]});state.map.addLayer({id:'navx-seaice',type:'raster',source:'navx-seaice',paint:{'raster-opacity':.42}});['currents','wind','seaice'].forEach(k=>applyLayerVisibility(k))}catch(e){console.warn('Scientific overlay rendering unavailable:',e.message)}}
+function applyLayerVisibility(kind){if(!state.mapReady)return;const visible=state.layers[kind]?'visible':'none';const ids={currents:['navx-currents'],wind:['navx-wind'],seaice:['navx-seaice'],hazards:['navx-hazards'],forecast:['navx-forecast-lines'],routes:Object.values(ROUTE_LAYER_IDS)}[kind]||[];ids.forEach(id=>{try{if(state.map.getLayer(id))state.map.setLayoutProperty(id,'visibility',visible)}catch(_){}})}
+function toggleLayer(kind,on){state.layers[kind]=Boolean(on);if(kind==='icebergs')renderIceMarkers();else if(kind==='vessels')renderVesselMarkers();else if(kind==='forecast')renderForecastAtHorizon();else if(kind==='routes')renderAllRoutes(false);else if(kind==='hazards')renderHazards(routeByProfile(state.activeProfile));else applyLayerVisibility(kind)}
+
+function graphCanvas(canvas){const ctx=canvas.getContext('2d'),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,W=Math.max(640,Math.floor(rect.width||900)),H=Math.max(360,Math.floor(rect.height||420));canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);return{ctx,W,H}}
+function drawRouteGraph(){const canvas=q('routeGraph');if(!canvas)return;const metrics=(state.routeResult?.comparison_metrics||[]).filter(x=>x.available);const st=q('routeGraphState');if(!metrics.length){st.textContent='NO VERIFIED ROUTE DATA AVAILABLE';const {ctx}=graphCanvas(canvas);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();ctx.fillText('NO VERIFIED ROUTE DATA AVAILABLE',24,34);return}st.textContent='BACKEND ROUTE METRICS · SELECTING A ROUTE UPDATES THE EMPHASIS';const {ctx,W,H}=graphCanvas(canvas),css=getComputedStyle(document.documentElement),muted=css.getPropertyValue('--muted').trim(),text=css.getPropertyValue('--text').trim();const defs=[['distance_km','Distance','km'],['eta_hours','Transit time','h'],['risk_score','Risk score','/100'],['min_effective_clearance_km','Iceberg clearance','km'],['minimum_cpa_km','Minimum CPA','km'],['sea_ice_max_percent','Sea ice max','%']];const left=120,top=26,rowH=(H-55)/defs.length;defs.forEach((d,di)=>{const valid=metrics.filter(m=>Number.isFinite(Number(m[d[0]])));ctx.fillStyle=muted;ctx.font='11px sans-serif';ctx.fillText(d[1],10,top+di*rowH+14);if(!valid.length){ctx.fillText('N/A — insufficient verified data',left,top+di*rowH+14);return}const max=Math.max(...valid.map(m=>Number(m[d[0]])),1);valid.forEach((m,i)=>{const v=Number(m[d[0]]),y=top+di*rowH+i*18,w=(W-left-95)*(v/max),selected=m.profile===state.activeProfile;ctx.fillStyle=ROUTE_COLORS[m.profile]||'#647885';ctx.globalAlpha=selected?1:.62;ctx.fillRect(left,y,Math.max(2,w),11);ctx.globalAlpha=1;ctx.fillStyle=text;ctx.font=selected?'bold 10px sans-serif':'10px sans-serif';ctx.fillText(`${m.profile[0]} ${v.toFixed(d[0]==='risk_score'?0:1)} ${d[2]}`,left+Math.max(5,w)+7,y+10)})})}
+async function loadIceExtent(){try{state.iceExtent=await getJson('/api/data/ice-extent-trends');q('iceExtentGraphState').textContent='OFFICIAL USNIC RECORDS · 2026 YTD';drawIceExtentGraph()}catch(e){q('iceExtentGraphState').textContent='OFFICIAL USNIC SEA-ICE EXTENT DATA UNAVAILABLE';state.iceExtent=null;drawIceExtentGraph()}}
+function parseUsnicDate(s){const a=String(s).split('-').map(Number);if(a.length!==3)return null;return new Date(Date.UTC(a[2],a[1]-1,a[0]))}
+function dayOfYear(d){const start=Date.UTC(d.getUTCFullYear(),0,0);return Math.floor((d.getTime()-start)/86400000)}
+function drawIceExtentGraph(){const canvas=q('iceExtentGraph');if(!canvas)return;const {ctx,W,H}=graphCanvas(canvas),data=state.iceExtent;if(!data?.years){ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();ctx.fillText('OFFICIAL USNIC SEA-ICE EXTENT DATA UNAVAILABLE',24,34);return}const css=getComputedStyle(document.documentElement),muted=css.getPropertyValue('--muted').trim(),text=css.getPropertyValue('--text').trim(),series=[];for(const y of ['2024','2025','2026']){const pts=(data.years[y]||[]).map(x=>{const d=parseUsnicDate(x.date);return d?[dayOfYear(d),Number(x.extent_millions_sqkm)]:null}).filter(Boolean);if(pts.length)series.push({name:y==='2026'?'2026 YTD':y,pts})}const clim=(data.climo_10yr||data.climatology||data['10_year_climatology']||[]);if(Array.isArray(clim)&&clim.length){const pts=clim.map((x,i)=>[Number(x.doy||x.day_of_year||i+1),Number(x.extent_millions_sqkm??x.value??x.extent)]).filter(x=>Number.isFinite(x[1]));if(pts.length)series.push({name:'10-year climatology',pts})}const all=series.flatMap(s=>s.pts);if(!all.length){ctx.fillStyle=muted;ctx.fillText('NO VERIFIED SEA-ICE TREND POINTS AVAILABLE',24,34);return}const minY=Math.min(...all.map(p=>p[1])),maxY=Math.max(...all.map(p=>p[1])),padL=58,padR=20,padT=20,padB=36,colors=['#147fa8','#158a67','#6458c9','#9d6a0d'];ctx.strokeStyle=muted;ctx.globalAlpha=.35;ctx.strokeRect(padL,padT,W-padL-padR,H-padT-padB);ctx.globalAlpha=1;series.forEach((ser,si)=>{ctx.beginPath();ser.pts.forEach((p,i)=>{const x=padL+(p[0]-1)/365*(W-padL-padR),y=padT+(maxY-p[1])/Math.max(.01,maxY-minY)*(H-padT-padB);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=colors[si%colors.length];ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=colors[si%colors.length];ctx.fillRect(padL+si*125,padT+4,10,3);ctx.fillStyle=text;ctx.font='10px sans-serif';ctx.fillText(ser.name,padL+14+si*125,padT+8)});ctx.fillStyle=muted;ctx.font='10px sans-serif';ctx.fillText(`${minY.toFixed(1)}–${maxY.toFixed(1)} million km²`,8,H-10);ctx.fillText('Day of year →',W-90,H-10)}
+function expandGraph(id){const el=q(id)?.closest('.card');if(!el)return;if(document.fullscreenElement)document.exitFullscreen();else el.requestFullscreen?.()}
+
+
+function numOrNull(v){const n=Number(v);return Number.isFinite(n)?n:null}
+function vectorSpeed(u,v){const a=numOrNull(u),b=numOrNull(v);return a===null||b===null?null:Math.hypot(a,b)}
+function vectorBearing(u,v){const a=numOrNull(u),b=numOrNull(v);if(a===null||b===null)return null;return(normLon(Math.atan2(a,b)*180/Math.PI)+360)%360}
+function dataState(ok){return ok?'<span class="state-pill state-ok">AVAILABLE</span>':'<span class="state-pill state-bad">UNAVAILABLE</span>'}
+function renderHomeStatus() {
+
+  const currentUsnic =
+    Number(
+      state.icebergs
+        ?.length || 0
+    );
+
+
+  const totalCatalog =
+    Number(
+      state.historyCatalog
+        ?.unique_icebergs || 0
+    );
+
+
+  const observations =
+    Number(
+      state.historyCatalog
+        ?.observation_rows || 0
+    );
+
+
+  const byuCurrent =
+    Number(
+      state.historyCatalog
+        ?.current_byu_designations || 0
+    );
+
+
+  const vessels =
+    Number(
+      state.vessels
+        ?.length || 0
+    );
+
+
+  const datasets =
+    state.health
+      ?.datasets || {};
+
+
+  if (
+    q('homeIcebergCount')
+  ) {
+
+    if (
+      totalCatalog > 0
+    ) {
+
+      q(
+        'homeIcebergCount'
+      ).textContent =
+
+        `${totalCatalog.toLocaleString()} catalog · ` +
+
+        `${currentUsnic.toLocaleString()} current`;
+
+
+      q(
+        'homeIcebergCount'
+      ).title =
+
+        `${totalCatalog.toLocaleString()} unique iceberg designations · ` +
+
+        `${observations.toLocaleString()} stored observations · ` +
+
+        `${currentUsnic.toLocaleString()} official-current USNIC · ` +
+
+        `${byuCurrent.toLocaleString()} supplemental-current BYU/SCP`;
+    }
+
+
+    else if (
+      currentUsnic > 0
+    ) {
+
+      q(
+        'homeIcebergCount'
+      ).textContent =
+
+        `${currentUsnic.toLocaleString()} current`;
+    }
+
+
+    else {
+
+      q(
+        'homeIcebergCount'
+      ).textContent =
+        'DATA UNAVAILABLE';
+    }
+  }
+
+
+  if (
+    q('homeAisCount')
+  ) {
+
+    q(
+      'homeAisCount'
+    ).textContent =
+
+      vessels
+        ? String(
+            vessels
+          )
+        : 'NO CURRENT POSITIONS';
+  }
+
+
+  if (
+    q('homeSurfaceStatus')
+  ) {
+
+    q(
+      'homeSurfaceStatus'
+    ).textContent =
+
+      state.health
+        ?.navigation_surface
+        ?.available
+
+        ? 'READY'
+
+        : 'UNAVAILABLE';
+  }
+
+
+  if (
+    q('homeDatasetStatus')
+  ) {
+
+    const available =
+      Object.values(
+        datasets
+      )
+        .filter(
+          Boolean
+        )
+        .length;
+
+
+    const total =
+      Object.keys(
+        datasets
+      )
+        .length;
+
+
+    q(
+      'homeDatasetStatus'
+    ).textContent =
+
+      total
+        ? `${available}/${total} loaded`
+        : 'checking…';
+  }
+
+
+  if (
+    q('homeDataMode')
+  ) {
+
+    q(
+      'homeDataMode'
+    ).textContent =
+
+      state.provenance
+        ?.data_mode
+
+      ||
+
+      'Checking scientific provenance…';
+  }
+}
+
+function activeRoute(){return routeByProfile(state.activeProfile)||(state.routeResult?.routes||[]).find(r=>r.available!==false)||null}
+function updateRouteDependentPanels(){
+  const r=activeRoute();
+  renderHomeStatus();renderRouteComparisonTable();renderRiskDashboard(r);renderAlerts(r);renderRiskDetailsSummary();
+}
+function renderRouteComparisonTable(){
+  const body=q('routeComparisonBody');if(!body)return;const routes=state.routeResult?.routes||[];
+  body.innerHTML=routes.length?routes.map(r=>r.available===false?`<tr><td><strong>${esc(routeLabel(r.profile))}</strong></td><td colspan="7"><span class="state-pill state-bad">UNAVAILABLE</span> ${esc(r.error||'No verified navigable path')}</td></tr>`:`<tr class="${r.profile===state.activeProfile?'selected-row':''}"><td><button class="link-button" onclick="selectProfile('${r.profile}',false)">${esc(routeLabel(r.profile))}</button></td><td>${Number(r.distance_km).toFixed(1)} km</td><td>${esc(formatDuration(r.eta_hours))}</td><td>${r.risk_score==null?'N/A':Number(r.risk_score).toFixed(0)+'/100'}</td><td>${r.min_clearance_km==null?'N/A':Number(r.min_clearance_km).toFixed(1)+' km'}</td><td>${r.minimum_cpa_km==null?'N/A':Number(r.minimum_cpa_km).toFixed(1)+' km'}</td><td>${r.sea_ice?.maximum_concentration_percent==null?'DATA UNAVAILABLE':Number(r.sea_ice.maximum_concentration_percent).toFixed(1)+'%'}</td><td>${esc(formatUtc(r.arrival_utc))}</td></tr>`).join(''):'<tr><td colspan="8">NO VERIFIED ROUTE DATA AVAILABLE</td></tr>';
+}
+function renderRiskDashboard(r){
+  if(!q('riskGaugeValue'))return;
+  if(!r){q('riskGaugeValue').textContent='--';q('riskGauge').style.setProperty('--score','0');q('riskLevelText').textContent='NO VERIFIED ROUTE DATA';q('riskEvidenceGrid').innerHTML='<div class="empty">Calculate a voyage to populate route-specific risk evidence.</div>';q('hazardList').innerHTML='<div class="empty">No selected-route hazards to display.</div>';return}
+  const score=numOrNull(r.risk_score);q('riskGaugeValue').textContent=score===null?'N/A':score.toFixed(0);q('riskGauge').style.setProperty('--score',score===null?0:Math.max(0,Math.min(100,score)));q('riskLevelText').textContent=r.risk||'INSUFFICIENT VERIFIED DATA';
+  const evidence=[['Minimum iceberg clearance',r.min_clearance_km==null?'N/A':Number(r.min_clearance_km).toFixed(1)+' km'],['Minimum CPA',r.minimum_cpa_km==null?'N/A':Number(r.minimum_cpa_km).toFixed(1)+' km'],['Sea-ice maximum',r.sea_ice?.maximum_concentration_percent==null?'DATA UNAVAILABLE':Number(r.sea_ice.maximum_concentration_percent).toFixed(1)+'%'],['Hazard encounters',String((r.hazards||[]).length)],['Arrival',formatUtc(r.arrival_utc)],['Route profile',routeLabel(r.profile)]];
+  q('riskEvidenceGrid').innerHTML=evidence.map(x=>`<div class="metric-card"><span>${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
+  const hazards=r.hazards||[];q('hazardList').innerHTML=hazards.length?hazards.slice(0,20).map(h=>`<div class="hazard-row"><div><strong>${esc(h.iceberg_id||'Iceberg')}</strong><span>${h.timestamp_utc?esc(formatUtc(h.timestamp_utc)):'Time unavailable'}</span></div><div><b>${h.distance_km==null?'N/A':Number(h.distance_km).toFixed(1)+' km'}</b><span>${h.uncertainty_radius_km==null?'uncertainty N/A':Number(h.uncertainty_radius_km).toFixed(1)+' km uncertainty'}</span></div></div>`).join(''):'<div class="empty">No backend-reported iceberg hazard encounters for the selected route.</div>';
+}
+function alertCard(level,title,text,source){return `<article class="alert-card ${level}"><div class="alert-icon">${level==='critical'?'!':level==='warning'?'△':'i'}</div><div><strong>${esc(title)}</strong><p>${esc(text)}</p><span>${esc(source)}</span></div></article>`}
+function renderAlerts(r){
+  const host=q('alertsList');if(!host)return;const items=[];
+  if(r){const score=numOrNull(r.risk_score),safe=Number(q('safetyBuffer')?.value||30);if(score!==null&&score>=60)items.push(alertCard('critical','High selected-route risk score',`Backend risk score is ${score.toFixed(0)}/100 for ${routeLabel(r.profile)}.`,'Current route analysis'));else if(score!==null&&score>=35)items.push(alertCard('warning','Moderate selected-route risk',`Backend risk score is ${score.toFixed(0)}/100 for ${routeLabel(r.profile)}.`,'Current route analysis'));if(numOrNull(r.min_clearance_km)!==null&&Number(r.min_clearance_km)<safe)items.push(alertCard('critical','Iceberg clearance below operator buffer',`Minimum effective clearance ${Number(r.min_clearance_km).toFixed(1)} km is below the ${safe.toFixed(0)} km operator buffer.`,'Route hazard engine'));if(numOrNull(r.sea_ice?.maximum_concentration_percent)!==null&&Number(r.sea_ice.maximum_concentration_percent)>=70)items.push(alertCard('warning','High sea-ice concentration on selected route',`Maximum verified NSIDC concentration is ${Number(r.sea_ice.maximum_concentration_percent).toFixed(1)}%.`,'NSIDC + route analysis'))}
+  const age=numOrNull(state.icebergMeta?.newest_observation_age_hours);if(age!==null&&age>168)items.push(alertCard('warning','USNIC iceberg observations are older than seven days',`Newest official observation age is ${age.toFixed(1)} hours.`,`USNIC official cadence`));if(!state.vessels?.length)items.push(alertCard('info','No current AIS positions received','NAV-X will not create simulated vessel traffic when the configured AIS provider has no usable positions.','AIS provider status'));if(!state.health?.navigation_surface?.available)items.push(alertCard('critical','Navigation surface unavailable','CMEMS/NSIDC navigation-surface validation is not available; verified routes cannot be generated.','System health'));
+  host.innerHTML=items.length?items.join(''):'<div class="empty">No current route/data rules are triggering an alert. This is not a declaration that navigation is safe.</div>';
+  if(q('alertCount'))q('alertCount').textContent=String(items.length);
+}
+function presetForecastPoint(kind){let p=null;if(kind==='origin')p=state.origin;else if(kind==='destination')p=state.destination;else if(kind==='map'&&state.mapReady){const c=state.map.getCenter();p={lat:Number(c.lat),lon:Number(c.lng)}};if(!p){q('forecastEvidence').textContent='Requested reference is unavailable. Select a route point or enter coordinates.';return}q('forecastLat').value=Number(p.lat).toFixed(5);q('forecastLon').value=Number(p.lon).toFixed(5);sampleEnvironmentalForecast()}
+async function sampleEnvironmentalForecast(){
+  const lat=Number(q('forecastLat').value),lon=Number(q('forecastLon').value);if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>NORTH_LIMIT||lon<-180||lon>180){q('forecastEvidence').textContent='Enter valid coordinates south of 45°S.';return}q('forecastEvidence').textContent='Loading real scientific forcing…';
+  try{const [f,s]=await Promise.all([getJson(`/api/environmental/precision-sample?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`),getJson(`/api/navigation/surface-check?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`)]);state.environmental={forcing:f,surface:s};const cs=vectorSpeed(f.ocean_u,f.ocean_v),cb=vectorBearing(f.ocean_u,f.ocean_v),ws=vectorSpeed(f.wind_u,f.wind_v),wb=vectorBearing(f.wind_u,f.wind_v);q('envCurrent').textContent=cs===null?'DATA UNAVAILABLE':`${cs.toFixed(3)} m/s · ${cb?.toFixed(0)??'N/A'}°`;q('envWind').textContent=ws===null?'DATA UNAVAILABLE':`${ws.toFixed(2)} m/s · ${wb?.toFixed(0)??'N/A'}°`;q('envSeaIce').textContent=s.surface?.sea_ice_concentration_percent==null?'DATA UNAVAILABLE':`${Number(s.surface.sea_ice_concentration_percent).toFixed(1)}%`;q('envMode').textContent=f.mode||f.data_mode||'REAL DATA';q('envWaves').textContent='DATA UNAVAILABLE — no verified wave field is loaded in this build.';q('forecastEvidence').innerHTML=`<strong>${esc(f.source||'Scientific forcing')}</strong><br>${esc(f.mode||f.data_mode||'')}<br>Navigation grade: ${f.navigation_grade===false?'NO — decision support only':'not declared'}${f.online_error?`<br>Online source unavailable; cached scientific forcing used: ${esc(f.online_error)}`:''}`}
+  catch(e){q('envCurrent').textContent='DATA UNAVAILABLE';q('envWind').textContent='DATA UNAVAILABLE';q('envSeaIce').textContent='DATA UNAVAILABLE';q('envMode').textContent='UNAVAILABLE';q('forecastEvidence').textContent=e.message}
+}
+function populateIcebergDetailSelect(){const ids=['riskIcebergSelect','forecastIcebergSelect'];for(const id of ids){const sel=q(id);if(!sel)continue;const old=sel.value;sel.innerHTML='<option value="">Select official iceberg…</option>'+state.icebergs.map(x=>`<option value="${esc(x.id)}">${esc(x.id)} · ${esc(x.observed)}</option>`).join('');if(state.icebergs.some(x=>x.id===old))sel.value=old}}
+async function loadSelectedIcebergDetails(source='risk'){
+  const sel=q(source==='forecast'?'forecastIcebergSelect':'riskIcebergSelect'),id=sel?.value;if(!id)return;const ib=state.icebergs.find(x=>x.id===id);if(!ib)return;
+  if(source==='forecast'){await ensureIcebergForecast(ib);return}
+  q('riskIcebergName').textContent=`Iceberg ${id}`;q('riskIcebergMeta').innerHTML=`<b>Observed:</b> ${esc(ib.observed)} &nbsp; <b>Position:</b> ${esc(fmtCoord(ib.lat,ib.lon))} &nbsp; <b>Dimensions:</b> ${Number.isFinite(ib.lengthNm)?ib.lengthNm:'N/A'} × ${Number.isFinite(ib.widthNm)?ib.widthNm:'N/A'} NM &nbsp; <b>Source:</b> ${esc(ib.source)}`;q('riskIcebergHistory').textContent='Loading official history…';
+  try{const [hist,fc]=await Promise.all([getJson(`/api/data/icebergs/${encodeURIComponent(id)}/history`),forecastOne({...ib,routeDistance:0})]);q('riskIcebergHistory').innerHTML=(hist.observations||[]).length?(hist.observations||[]).map(o=>`<div class="history-point"><strong>${esc(o.date)}</strong><span>${esc(fmtCoord(o.latitude,o.longitude))}</span><small>${esc(o.position_type)}</small></div>`).join(''):'<div class="empty">No distinct archived official fixes are available for this designation.</div>';q('riskForecastTable').innerHTML=fc?.trajectory?.length?fc.trajectory.map(n=>`<tr><td>+${Number(n.horizon_hours||0)}h</td><td>${esc(n.forecast_timestamp||'N/A')}</td><td>${esc(fmtCoord(n.latitude,n.longitude))}</td><td>${numOrNull(n.drift_speed_ms)===null?'N/A':Number(n.drift_speed_ms).toFixed(2)+' m/s'}</td><td>${numOrNull(n.uncertainty_radius_km)===null?'N/A':Number(n.uncertainty_radius_km).toFixed(1)+' km'}</td><td>MODEL FORECAST</td></tr>`).join(''):'<tr><td colspan="6">MODEL FORECAST UNAVAILABLE</td></tr>';q('riskConfidence').textContent=fc?.meta?.quality?.level?`Model quality: ${fc.meta.quality.level}. Navigation accuracy is not certified.`:'Model confidence is not certified; verification data may be insufficient.'}
+  catch(e){q('riskIcebergHistory').textContent=e.message;q('riskForecastTable').innerHTML='<tr><td colspan="6">DATA UNAVAILABLE</td></tr>'}
+}
+async function ensureIcebergForecast(ib){q('forecastIcebergTable').innerHTML='<tr><td colspan="6">Calculating physics-informed forecast from the official fix…</td></tr>';const fc=await forecastOne({...ib,routeDistance:0});if(!fc){q('forecastIcebergTable').innerHTML='<tr><td colspan="6">MODEL FORECAST UNAVAILABLE</td></tr>';return}q('forecastIcebergTable').innerHTML=(fc.trajectory||[]).map(n=>`<tr><td>+${Number(n.horizon_hours||0)}h</td><td>${esc(n.forecast_timestamp||'N/A')}</td><td>${esc(fmtCoord(n.latitude,n.longitude))}</td><td>${numOrNull(n.drift_speed_ms)===null?'N/A':Number(n.drift_speed_ms).toFixed(2)+' m/s'}</td><td>${numOrNull(n.drift_bearing_deg)===null?'N/A':Number(n.drift_bearing_deg).toFixed(0)+'°'}</td><td>${numOrNull(n.uncertainty_radius_km)===null?'N/A':Number(n.uncertainty_radius_km).toFixed(1)+' km'}</td></tr>`).join('')||'<tr><td colspan="6">MODEL FORECAST UNAVAILABLE</td></tr>'}
+function renderRiskDetailsSummary(){const sel=q('riskIcebergSelect');if(sel&&!sel.value&&state.icebergs?.length){sel.value=state.icebergs[0].id;loadSelectedIcebergDetails('risk')}}
+  async function runScenario() {
+
+  const box =
+    q('scenarioStatus');
+
+
+  if (
+    !box
+  ) {
+    return;
+  }
+
+
+  function scenarioStatus(
+    message,
+    type = ''
+  ) {
+
+    box.textContent =
+      message;
+
+    box.className =
+      'analysis-status' +
+      (
+        type
+          ? ` ${type}`
+          : ''
+      );
+  }
+
+
+  if (
+    !state.origin ||
+    !state.destination
+  ) {
+
+    scenarioStatus(
+      (
+        'Select Start and Destination in Voyage Planner first. ' +
+        'You do not need to generate the main route before running a scenario.'
+      ),
+      'error'
+    );
+
+    return;
+  }
+
+
+  const speed =
+    Number(
+      q('scenarioSpeed').value
+    );
+
+  const safety =
+    Number(
+      q('scenarioSafety').value
+    );
+
+
+  if (
+    !Number.isFinite(speed)
+    ||
+    speed < 1
+    ||
+    speed > 70
+  ) {
+
+    scenarioStatus(
+      'Scenario vessel speed must be between 1 and 70 km/h.',
+      'error'
+    );
+
+    return;
+  }
+
+
+  if (
+    !Number.isFinite(safety)
+    ||
+    safety < 5
+    ||
+    safety > 150
+  ) {
+
+    scenarioStatus(
+      'Scenario safety buffer must be between 5 and 150 km.',
+      'error'
+    );
+
+    return;
+  }
+
+
+  try {
+
+    checkAntarctic(
+      state.origin,
+      'Scenario start'
+    );
+
+    checkAntarctic(
+      state.destination,
+      'Scenario destination'
+    );
+
+
+    const directKm =
+      hav(
+        state.origin.lat,
+        state.origin.lon,
+        state.destination.lat,
+        state.destination.lon
+      );
+
+
+    if (
+      !Number.isFinite(directKm)
+      ||
+      directKm < 1
+    ) {
+      throw new Error(
+        'Scenario Start and Destination must be different valid Antarctic positions.'
+      );
+    }
+
+
+    scenarioStatus(
+      'RUNNING WHAT-IF ROUTE…',
+      'busy'
+    );
+
+
+    const departureUtc =
+      departureIso();
+
+
+    function buildScenarioPayload(
+      gridNodes
+    ) {
+
+      return {
+        origin:
+          state.origin,
+
+        destination:
+          state.destination,
+
+        speed_kmh:
+          speed,
+
+        safety_threshold_km:
+          safety,
+
+        grid_nodes:
+          gridNodes,
+
+        icebergs:
+          state.forecasts || [],
+
+        vessel_type:
+          q('vesselType')?.value || 'Other',
+
+        departure_utc:
+          departureUtc
+      };
+    }
+
+
+    const result =
+      await optimizeWithAdaptiveGrid(
+        buildScenarioPayload,
+        'scenario'
+      );
+
+
+    state.scenarioResult =
+      result;
+
+
+    const scenarioRoute =
+      availableRouteFromResult(
+        result
+      );
+
+
+    if (
+      !scenarioRoute
+    ) {
+
+      if (q('scenarioProfile')) {
+        q('scenarioProfile').textContent =
+          'UNAVAILABLE';
+      }
+
+      if (q('scenarioRisk')) {
+        q('scenarioRisk').textContent =
+          'N/A';
+      }
+
+      if (q('scenarioEta')) {
+        q('scenarioEta').textContent =
+          'N/A';
+      }
+
+      if (q('scenarioDistance')) {
+        q('scenarioDistance').textContent =
+          'N/A';
+      }
+
+      if (q('scenarioDelta')) {
+        q('scenarioDelta').textContent =
+          'No verified route was returned for this scenario.';
+      }
+
+
+      scenarioStatus(
+        'NO VERIFIED ROUTE AVAILABLE FOR THIS SCENARIO',
+        'error'
+      );
+
+      return;
+    }
+
+
+    const base =
+      activeRoute();
+
+
+    if (q('scenarioRisk')) {
+
+      q('scenarioRisk').textContent =
+        scenarioRoute.risk_score == null
+
+          ? 'N/A'
+
+          : (
+              Number(
+                scenarioRoute.risk_score
+              ).toFixed(0)
+              +
+              '/100'
+            );
+    }
+
+
+    if (q('scenarioEta')) {
+
+      q('scenarioEta').textContent =
+        formatDuration(
+          scenarioRoute.eta_hours
+        );
+    }
+
+
+    if (q('scenarioDistance')) {
+
+      q('scenarioDistance').textContent =
+        `${Number(
+          scenarioRoute.distance_km
+        ).toFixed(1)} km`;
+    }
+
+
+    if (q('scenarioProfile')) {
+
+      q('scenarioProfile').textContent =
+        routeLabel(
+          scenarioRoute.profile
+        );
+    }
+
+
+    if (q('scenarioDelta')) {
+
+      q('scenarioDelta').innerHTML =
+        base
+
+          ? (
+              `Compared with current ${esc(
+                routeLabel(
+                  base.profile
+                )
+              )}: ` +
+              `risk ${deltaText(
+                scenarioRoute.risk_score,
+                base.risk_score,
+                ''
+              )}, ` +
+              `ETA ${deltaText(
+                scenarioRoute.eta_hours,
+                base.eta_hours,
+                ' h'
+              )}, ` +
+              `distance ${deltaText(
+                scenarioRoute.distance_km,
+                base.distance_km,
+                ' km'
+              )}.`
+            )
+
+          : (
+              'Standalone scenario completed. ' +
+              'No baseline route is currently selected.'
+            );
+    }
+
+
+    scenarioStatus(
+      (
+        'WHAT-IF MODEL OUTPUT COMPLETE — ' +
+        'uses verified source data with changed operator parameters.'
+      ),
+      'ok'
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      'Scenario error:',
+      error
+    );
+
+
+    scenarioStatus(
+      `SCENARIO UNAVAILABLE — ${error.message}`,
+      'error'
+    );
+
+
+    if (q('scenarioDelta')) {
+      q('scenarioDelta').textContent =
+        error.message || String(error);
+    }
+  }
+}
+function deltaText(a,b,u){const x=numOrNull(a),y=numOrNull(b);if(x===null||y===null)return'N/A';const d=x-y;return`${d>=0?'+':''}${d.toFixed(1)}${u}`}
+async function loadAiStatus(){
+  try{state.aiStatus=await getJson('/api/ai/status');renderAiStatus()}catch(e){state.aiStatus=null;if(q('aiDriftStatus'))q('aiDriftStatus').textContent='UNAVAILABLE';if(q('aiTrainingNote'))q('aiTrainingNote').textContent=`AI status unavailable: ${e.message}`}
+}
+function renderAiStatus(){
+  if(!q('aiDriftStatus'))return;const s=state.aiStatus||{},d=s.iceberg_drift||{},a=s.ais_anomaly||{},v=d.validation||{};
+  q('aiDriftStatus').textContent=d.status||'UNKNOWN';q('aiDriftStatus').className=`v ${d.runtime_enabled?'ml-active':'ml-hold'}`;q('aiDriftSamples').textContent=`${d.training_samples||0} real USNIC transition samples`;
+  q('aiGateStatus').textContent=d.runtime_enabled?'PASS / APPLIED':'HOLD';q('aiGateStatus').className=`v ${d.runtime_enabled?'ml-active':'ml-hold'}`;q('aiValidationText').textContent=v.hybrid_endpoint_mae_km!=null?`Held-out hybrid ${v.hybrid_endpoint_mae_km} km vs physics ${v.physics_endpoint_mae_km} km endpoint MAE`:'No held-out metric available';
+  q('aiAisStatus').textContent=a.status||'UNKNOWN';q('aiAisStatus').className=`v ${a.trained?'ml-active':'ml-hold'}`;q('aiAisSamples').textContent=a.trained?`${a.training_samples||0} genuine AIS samples · ${a.unique_vessels||0} vessels`:`${a.valid_training_samples||0}/${a.minimum_required||30} valid training samples · ${a.real_database_samples||0} stored AIS positions · ${a.unique_vessels||0} vessels`;
+  q('aiModelVersion').textContent=d.model_version||'UNTRAINED';q('aiAlgorithm').textContent=d.type||'--';q('aiTrainingSamples').textContent=`${d.training_samples||0} official transitions · ${v.method||'validation method unavailable'}`;q('aiPhysicsMae').textContent=v.physics_endpoint_mae_km==null?'DATA UNAVAILABLE':`${v.physics_endpoint_mae_km} km held-out endpoint MAE`;q('aiHybridMae').textContent=v.hybrid_endpoint_mae_km==null?'DATA UNAVAILABLE':`${v.hybrid_endpoint_mae_km} km held-out endpoint MAE`;q('aiTrainingSources').textContent=(d.official_sources||[]).join(', ')||'No training sources recorded';q('aiTrainingNote').textContent=d.note||'No model note available.';
+}
+function decisionContext(){
+  const rr=state.routeResult||null,routes=(rr?.routes||[]).map(r=>({profile:r.profile,available:r.available,distance_km:r.distance_km,eta_hours:r.eta_hours,risk:r.risk,risk_score:r.risk_score,min_clearance_km:r.min_clearance_km,minimum_cpa_km:r.minimum_cpa_km,tca_utc:r.tca_utc,closest_iceberg_id:r.closest_iceberg_id,hazards:r.hazards||[],sea_ice:r.sea_ice||null,explainability:r.explainability||null}));
+  return {active_profile:state.activeProfile,route_result:rr?{recommended_profile:rr.recommended_profile,explanation:rr.explanation,routes}:null};
+}
+async function loadAiDecision(){
+  if(!state.routeResult){state.aiDecision=null;renderAiDecision();return}
+  try{state.aiDecision=await postJson('/api/ai/decision-support',{context:decisionContext()});renderAiDecision()}catch(e){state.aiDecision={readiness:'UNAVAILABLE',recommendation:null,summary:`Decision analysis unavailable: ${e.message}`,reasons:[],tradeoffs:[],route_matrix:[]};renderAiDecision()}
+}
+function renderAiDecision(){
+  if(!q('aiDecisionReadiness'))return;const d=state.aiDecision;
+  if(!d){q('aiDecisionReadiness').textContent='NO ROUTE';q('aiDecisionReadiness').className='v ml-hold';q('aiDecisionCompleteness').textContent='Generate a voyage to create an evidence-backed recommendation.';q('aiDecisionState').textContent='AWAITING ROUTE';q('aiDecisionProfile').textContent='No recommendation yet';q('aiDecisionSummary').textContent='Generate FASTEST, BALANCED and SAFEST route alternatives to produce an evidence-backed decision report.';q('aiDecisionRisk').textContent='--';q('aiDecisionCpa').textContent='--';q('aiDecisionClearance').textContent='--';q('aiDecisionEta').textContent='--';q('aiDecisionReasons').innerHTML='<li>No route analysis is available yet.</li>';q('aiDecisionTradeoffs').innerHTML='<li>Generate a voyage to compare ETA, distance and safety evidence.</li>';q('aiRouteMatrixBody').innerHTML='<tr><td colspan="8">NO ROUTE EVIDENCE</td></tr>';return}
+  const rec=d.recommendation||null,ready=d.readiness||'UNKNOWN',complete=Number(d.evidence_completeness||0);q('aiDecisionReadiness').textContent=ready;q('aiDecisionReadiness').className=`v ${ready==='READY'?'ml-active':'ml-hold'}`;q('aiDecisionCompleteness').textContent=`Evidence completeness: ${complete}% · structured decision support`;q('aiDecisionState').textContent=ready;q('aiDecisionMode').textContent=d.mode||'STRUCTURED / EXPLAINABLE';q('aiDecisionProfile').textContent=rec?.profile?routeLabel(rec.profile):'No verified recommendation';q('aiDecisionSummary').textContent=d.summary||'No decision summary available.';q('aiDecisionRisk').textContent=rec?.risk_score==null?(rec?.risk||'N/A'):`${Number(rec.risk_score).toFixed(0)}/100 · ${rec.risk||'N/A'}`;q('aiDecisionCpa').textContent=rec?.minimum_cpa_km==null?'DATA UNAVAILABLE':`${Number(rec.minimum_cpa_km).toFixed(1)} km`;q('aiDecisionClearance').textContent=rec?.min_clearance_km==null?'DATA UNAVAILABLE':`${Number(rec.min_clearance_km).toFixed(1)} km`;q('aiDecisionEta').textContent=rec?.eta_hours==null?'DATA UNAVAILABLE':formatDuration(rec.eta_hours);
+  const reasons=d.reasons||[],trade=d.tradeoffs||[];q('aiDecisionReasons').innerHTML=(reasons.length?reasons:['No comparative evidence is complete enough for an additional claim.']).map(x=>`<li>${esc(x)}</li>`).join('');q('aiDecisionTradeoffs').innerHTML=(trade.length?trade:['No quantified trade-off is currently available.']).map(x=>`<li>${esc(x)}</li>`).join('');
+  const rows=d.route_matrix||[];q('aiRouteMatrixBody').innerHTML=rows.length?rows.map(r=>`<tr><td><strong>${esc(routeLabel(r.profile))}</strong></td><td>${r.risk_score==null?esc(r.risk||'N/A'):`${Number(r.risk_score).toFixed(0)}/100 · ${esc(r.risk||'')}`}</td><td>${r.eta_hours==null?'N/A':esc(formatDuration(r.eta_hours))}</td><td>${r.distance_km==null?'N/A':Number(r.distance_km).toFixed(1)+' km'}</td><td>${r.minimum_cpa_km==null?'N/A':Number(r.minimum_cpa_km).toFixed(1)+' km'}</td><td>${r.min_clearance_km==null?'N/A':Number(r.min_clearance_km).toFixed(1)+' km'}</td><td>${Number(r.hazard_count||0)}</td><td>${r.sea_ice_max_percent==null?'N/A':Number(r.sea_ice_max_percent).toFixed(1)+'%'}</td></tr>`).join(''):'<tr><td colspan="8">NO ROUTE EVIDENCE</td></tr>';
+}
+async function loadAiAnomalies(){
+  try{state.aiAnomalies=await getJson('/api/ai/vessel-anomalies');renderAiAnomalies()}catch(e){state.aiAnomalies={error:e.message,results:[]};renderAiAnomalies()}
+}
+function renderAiAnomalies(){
+  if(!q('aiAnomalyMonitorStatus'))return;const d=state.aiAnomalies||{},m=d.model||{},rows=d.results||[];if(d.error){q('aiAnomalyMonitorStatus').textContent='AIS anomaly analysis unavailable';q('aiAnomalySummary').textContent=d.error;q('aiAnomalyBody').innerHTML='<tr><td colspan="5">DATA UNAVAILABLE</td></tr>';return}if(!m.trained){q('aiAnomalyMonitorStatus').textContent=m.status||'COLLECTING_REAL_AIS_DATA';q('aiAnomalySummary').textContent=`${m.valid_training_samples||0}/${m.minimum_required||30} valid training samples · ${m.real_database_samples||0} stored AIS positions · ${m.unique_vessels||0} vessels · automatic training checks are enabled.`;q('aiAnomalyBody').innerHTML='<tr><td colspan="5">COLLECTING REAL AIS — model activates automatically after the minimum genuine sample threshold</td></tr>';return}const unusual=rows.filter(x=>x.anomaly);q('aiAnomalyMonitorStatus').textContent=`${unusual.length} unusual pattern${unusual.length===1?'':'s'} in ${rows.length} scored vessel${rows.length===1?'':'s'}`;q('aiAnomalySummary').textContent=rows.length?'Current received AIS snapshot scored against the trained Isolation Forest.':'No current AIS positions were available to score.';q('aiAnomalyBody').innerHTML=rows.length?rows.slice().sort((a,b)=>Number(b.anomaly_score||0)-Number(a.anomaly_score||0)).slice(0,25).map(r=>`<tr><td>${esc(r.name||'Unnamed vessel')}</td><td>${esc(r.mmsi||'N/A')}</td><td><strong class="${r.anomaly?'risk-high':'risk-low'}">${esc(r.label||'UNKNOWN')}</strong></td><td>${Number.isFinite(Number(r.anomaly_score))?Number(r.anomaly_score).toFixed(4):'N/A'}</td><td>${esc(formatUtc(r.last_seen_utc))}</td></tr>`).join(''):'<tr><td colspan="5">NO CURRENT AIS POSITIONS TO SCORE</td></tr>';
+}
+async function refreshAiDecisionCenter(includeAis=true){
+  const tasks=[loadAiStatus(),loadAiDecision()];if(includeAis)tasks.push(loadAiAnomalies());await Promise.allSettled(tasks);renderAiStatus();renderAiDecision();renderAiAnomalies();
+}
+
+function renderDataObservatory(){
+  const body=q('observatoryBody');if(!body)return;const p=state.provenance?.sources||{},h=state.health||{};
+  const rows=[
+    ['AIS',h.ais_provider||'Configured provider',h.ais_provider_enabled?'ENABLED':'UNAVAILABLE',state.vessels?.length?`${state.vessels.length} received positions`:'No current positions','Vessel positions'],
+    ['USNIC',p.usnic?.provider||'U.S. National Ice Center',p.usnic?.status||'DATA UNAVAILABLE',p.usnic?.observation_date||state.icebergMeta?.timestamp||'date unavailable','Iceberg catalogue'],
+    ['CMEMS',p.cmems?.provider||'Copernicus Marine',p.cmems?.status||'DATA UNAVAILABLE',p.cmems?.temporal_coverage||'date unavailable','Ocean currents / ocean mask'],
+    ['ECMWF / ERA5',p.era5?.provider||'ECMWF',p.era5?.status||'DATA UNAVAILABLE',p.era5?.temporal_coverage||'date unavailable','Wind / atmospheric forcing'],
+    ['NSIDC',p.nsidc?.provider||'NSIDC',p.nsidc?.status||'DATA UNAVAILABLE',p.nsidc?.date||'date unavailable','Sea-ice concentration'],
+    ['USNIC Sea Ice',p.usnic_sea_ice_extent?.provider||'USNIC',p.usnic_sea_ice_extent?.status||'DATA UNAVAILABLE','Official archived daily records','Extent trends']
+  ];body.innerHTML=rows.map(r=>`<tr><td><strong>${esc(r[0])}</strong></td><td>${esc(r[1])}</td><td>${statePill(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[4])}</td></tr>`).join('');
+  if(q('observatoryHealth'))q('observatoryHealth').textContent=h.status?String(h.status).toUpperCase():'UNKNOWN';if(q('observatoryMode'))q('observatoryMode').textContent=state.provenance?.data_mode||'DATA MODE UNAVAILABLE';
+}
+function statePill(s){const v=String(s||'').toUpperCase(),ok=!v.includes('UNAVAILABLE')&&!v.includes('ERROR')&&!v.includes('MISSING')&&!v.includes('DISABLED');return `<span class="state-pill ${ok?'state-ok':'state-bad'}">${esc(s||'UNKNOWN')}</span>`}
+async function loadArchive(){try{state.archive=await getJson('/api/data/icebergs/archive');const sel=q('historySnapshot');if(sel){sel.innerHTML=(state.archive.snapshots||[]).map((s,i)=>`<option value="${i}">${esc(s.observed_date||s.snapshot_id)} · ${s.count} official fixes</option>`).join('');sel.value=String(Math.max(0,(state.archive.snapshots||[]).length-1))}renderHistoricalReplay()}catch(e){state.archive=null;if(q('historyStatus'))q('historyStatus').textContent=`Historical archive unavailable: ${e.message}`}}
+function renderHistoricalReplay(){const data=state.archive?.snapshots||[],sel=q('historySnapshot');if(!sel||!data.length){if(q('historyStatus'))q('historyStatus').textContent='NO ARCHIVED OFFICIAL USNIC SNAPSHOTS AVAILABLE';return}const snap=data[Number(sel.value)||0]||data[0],features=snap.icebergs?.features||[];q('historyStatus').textContent=`USNIC archived official snapshot · observed ${snap.observed_date||'date unavailable'} · ${features.length} fixes · no interpolation`;q('historyTable').innerHTML=features.map(f=>{const p=f.properties||{},c=f.geometry?.coordinates||[];return`<tr><td>${esc(p.id)}</td><td>${esc(fmtCoord(c[1],c[0]))}</td><td>${p.length_nm??'N/A'} × ${p.width_nm??'N/A'} NM</td><td>${esc(p.date_observed||'N/A')}</td></tr>`}).join('')||'<tr><td colspan="4">NO FIXES</td></tr>';drawHistoricalPlot(features)}
+function drawHistoricalPlot(features){const canvas=q('historyCanvas');if(!canvas)return;const {ctx,W,H}=graphCanvas(canvas),cx=W/2,cy=H/2,R=Math.min(W,H)*.42;ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--line-strong').trim();ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();ctx.font='10px sans-serif';for(const deg of [0,90,180,270]){const a=(deg-90)*Math.PI/180;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a));ctx.stroke()}for(const lat of [-60,-70,-80]){const rr=R*((90-Math.abs(lat))/45);ctx.beginPath();ctx.arc(cx,cy,rr,0,2*Math.PI);ctx.stroke();ctx.fillText(`${Math.abs(lat)}°S`,cx+rr+4,cy)}for(const f of features){const c=f.geometry?.coordinates||[],lon=Number(c[0]),lat=Number(c[1]);if(!Number.isFinite(lon)||!Number.isFinite(lat))continue;const rr=R*((90-Math.abs(lat))/45),a=(lon-90)*Math.PI/180,x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);ctx.beginPath();ctx.arc(x,y,3,0,2*Math.PI);ctx.fill()}ctx.fillText('Schematic polar plot of official USNIC fixes — not a navigation basemap',16,H-14)}
+async function loadHistoryCatalog() {
+
+  try {
+
+    /*
+     * Unified database endpoint.
+     *
+     * This is separate from the current USNIC navigation
+     * endpoint used by loadIcebergs().
+     */
+
+    const h = await getJson(
+      '/api/data/icebergs/all/catalog?limit=5000'
+    );
+
+
+    state.historyCatalog =
+      h;
+
+
+    const unique =
+      Number(
+        h.unique_icebergs || 0
+      );
+
+
+    const observations =
+      Number(
+        h.observation_rows || 0
+      );
+
+
+    const historical =
+      Number(
+        h.historical_rows || 0
+      );
+
+
+    const usnicCurrent =
+      Number(
+        h.current_usnic_designations || 0
+      );
+
+
+    const byuCurrent =
+      Number(
+        h.current_byu_designations || 0
+      );
+
+
+    if (
+      q('historyCatalogStatus')
+    ) {
+
+      q(
+        'historyCatalogStatus'
+      ).textContent =
+
+        `${unique.toLocaleString()} designations · ` +
+
+        `${observations.toLocaleString()} stored positions · ` +
+
+        `${historical.toLocaleString()} historical · ` +
+
+        `${usnicCurrent.toLocaleString()} official-current USNIC · ` +
+
+        `${byuCurrent.toLocaleString()} supplemental-current BYU/SCP`;
+    }
+
+
+    if (
+      q('icebergSourceText')
+    ) {
+
+      q(
+        'icebergSourceText'
+      ).textContent =
+
+        `${unique.toLocaleString()} unique iceberg designations · ` +
+
+        `${observations.toLocaleString()} real stored observations · ` +
+
+        `${usnicCurrent.toLocaleString()} official-current USNIC · ` +
+
+        `${byuCurrent.toLocaleString()} supplemental-current BYU/SCP · ` +
+
+        `${historical.toLocaleString()} historical positions`;
+    }
+
+
+    if (
+      q('catalogUniqueCount')
+    ) {
+
+      q(
+        'catalogUniqueCount'
+      ).textContent =
+        unique.toLocaleString();
+    }
+
+
+    if (
+      q('catalogObservationCount')
+    ) {
+
+      q(
+        'catalogObservationCount'
+      ).textContent =
+        observations.toLocaleString();
+    }
+
+
+    if (
+      q('catalogUsnicCount')
+    ) {
+
+      q(
+        'catalogUsnicCount'
+      ).textContent =
+        usnicCurrent.toLocaleString();
+    }
+
+
+    if (
+      q('catalogByuCurrentCount')
+    ) {
+
+      q(
+        'catalogByuCurrentCount'
+      ).textContent =
+        byuCurrent.toLocaleString();
+    }
+
+
+    if (
+      q('catalogHistoricalCount')
+    ) {
+
+      q(
+        'catalogHistoricalCount'
+      ).textContent =
+        historical.toLocaleString();
+    }
+
+
+    renderHistoryCatalog();
+
+    renderIcebergTable();
+
+    renderHomeStatus();
+
+  }
+
+  catch (e) {
+
+    console.error(
+      'Unified iceberg catalogue unavailable:',
+      e
+    );
+
+
+    state.historyCatalog =
+      null;
+
+
+    if (
+      q('historyCatalogStatus')
+    ) {
+
+      q(
+        'historyCatalogStatus'
+      ).textContent =
+        `Historical catalogue unavailable: ${e.message}`;
+    }
+
+
+    if (
+      q('historyCatalogTable')
+    ) {
+
+      q(
+        'historyCatalogTable'
+      ).innerHTML =
+        (
+          '<tr>' +
+          '<td colspan="6">' +
+          'HISTORICAL DATA UNAVAILABLE' +
+          '</td>' +
+          '</tr>'
+        );
+    }
+
+
+    if (
+      q('icebergSourceText')
+    ) {
+
+      q(
+        'icebergSourceText'
+      ).textContent =
+        'Unified iceberg database unavailable.';
+    }
+
+
+    renderIcebergTable();
+
+    renderHomeStatus();
+  }
+}
+
+function renderHistoryCatalog(){
+  const body=q('historyCatalogTable');if(!body)return;const term=(q('historyCatalogSearch')?.value||'').trim().toLowerCase();const rows=(state.historyCatalog?.catalog||[]).filter(r=>!term||String(r.iceberg_id||'').toLowerCase().includes(term));body.innerHTML=rows.length?rows.slice(0,5000).map(r=>`<tr><td><strong>${esc(r.iceberg_id)}</strong></td><td>${esc((r.first_observed_at||'N/A').slice(0,10))}</td><td>${esc((r.last_observed_at||'N/A').slice(0,10))}</td><td>${Number(r.observation_count||0).toLocaleString()}</td><td>${r.currently_in_usnic_database?'<span class="state-pill state-ok">YES</span>':'NO'}</td><td><button class="btn btn-secondary btn-small" onclick="viewHistoricalTrack('${esc(r.iceberg_id)}')">Track</button></td></tr>`).join(''):'<tr><td colspan="6">NO MATCHING HISTORICAL TRACKS</td></tr>';
+}
+async function viewHistoricalTrack(icebergId){
+  try{const result=await getJson(`/api/data/icebergs/${encodeURIComponent(icebergId)}/history/all`);state.historyTrack=result;const obs=result.observations||[];if(q('historyTrackStatus'))q('historyTrackStatus').textContent=`${result.iceberg_id} · ${Number(obs.length).toLocaleString()} stored published positions · current authority: ${result.authoritative_current_source||'USNIC'}`;if(q('historyTrackTable'))q('historyTrackTable').innerHTML=obs.length?obs.slice().reverse().slice(0,3000).map(o=>`<tr><td>${esc(o.date||'N/A')}</td><td>${esc(fmtCoord(o.latitude,o.longitude))}</td><td>${esc(o.source||'N/A')}</td><td>${esc(o.sensor||o.position_type||'published fix')}</td></tr>`).join(''):'<tr><td colspan="4">NO STORED TRACK POSITIONS</td></tr>';drawHistoricalTrack(obs);navigateTo('historicalSection')}catch(e){if(q('historyTrackStatus'))q('historyTrackStatus').textContent=`Track unavailable: ${e.message}`}
+}
+function drawHistoricalTrack(observations){
+  const canvas=q('historyTrackCanvas');if(!canvas)return;const {ctx,W,H}=graphCanvas(canvas),cx=W/2,cy=H/2,R=Math.min(W,H)*.42;const line=getComputedStyle(document.documentElement).getPropertyValue('--line-strong').trim(),accent=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#147fa8',muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();ctx.strokeStyle=line;ctx.fillStyle=muted;ctx.font='10px sans-serif';for(const lat of [-60,-70,-80]){const rr=R*((90-Math.abs(lat))/45);ctx.beginPath();ctx.arc(cx,cy,rr,0,2*Math.PI);ctx.stroke();ctx.fillText(`${Math.abs(lat)}°S`,cx+rr+4,cy)}const pts=[];for(const o of observations||[]){const lon=Number(o.longitude),lat=Number(o.latitude);if(!Number.isFinite(lon)||!Number.isFinite(lat))continue;const rr=R*((90-Math.abs(lat))/45),a=(lon-90)*Math.PI/180;pts.push([cx+rr*Math.cos(a),cy+rr*Math.sin(a)])}if(pts.length){ctx.strokeStyle=accent;ctx.lineWidth=1.5;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();ctx.fillStyle=accent;for(const p of pts){ctx.beginPath();ctx.arc(p[0],p[1],1.8,0,Math.PI*2);ctx.fill()}}ctx.fillStyle=muted;ctx.fillText('Historical published track — not a current navigation hazard layer',16,H-14);
+}
+function globalSearch(){const term=(q('globalSearch')?.value||'').trim().toLowerCase();if(!term)return;const pages=Object.entries(viewMeta);const hit=pages.find(([,m])=>m.join(' ').toLowerCase().includes(term));if(hit){navigateTo(hit[0]);return}const ib=state.icebergs.find(x=>x.id.toLowerCase().includes(term));if(ib){navigateTo('riskDetails');q('riskIcebergSelect').value=ib.id;loadSelectedIcebergDetails('risk');return}const v=state.vessels.find(x=>[x.name,x.mmsi,x.imo,x.call_sign].some(y=>String(y||'').toLowerCase().includes(term)));if(v){navigateTo('vesselCatalog');q('vesselSearch').value=term;renderVesselTable();return}const hist=(state.historyCatalog?.catalog||[]).find(x=>String(x.iceberg_id||'').toLowerCase().includes(term));if(hist){navigateTo('historicalSection');q('historyCatalogSearch').value=hist.iceberg_id;renderHistoryCatalog();return}q('globalSearch').setCustomValidity('No matching NAV-X page, iceberg, historical track, or received AIS vessel.');q('globalSearch').reportValidity();setTimeout(()=>q('globalSearch').setCustomValidity(''),1200)}
+function toggleAutoRefresh(on){state.autoRefresh=Boolean(on);localStorage.setItem('navx-auto-refresh',state.autoRefresh?'1':'0');if(state.autoRefreshTimer)clearInterval(state.autoRefreshTimer);state.autoRefreshTimer=null;if(state.autoRefresh)state.autoRefreshTimer=setInterval(()=>refreshData(),300000);q('autoRefreshStatus').textContent=state.autoRefresh?'Every 5 minutes':'Off'}
+function initSettings(){const on=localStorage.getItem('navx-auto-refresh')==='1';q('autoRefreshToggle').checked=on;toggleAutoRefresh(on);q('settingsTheme').value=theme()}
+function setThemeFromSelect(v){document.documentElement.dataset.theme=v;localStorage.setItem('navx-theme',v);syncTheme();q('settingsTheme').value=v}
+
+window.addEventListener('resize',()=>{if(state.mapReady)state.map.resize();drawRouteGraph();drawIceExtentGraph()});
+async function refreshData(){invalidateRoute('Scientific data refreshed');setAnalysis('LOADING REAL DATA…','busy');await Promise.allSettled([loadIcebergs(),loadVessels(),loadHealth(),loadIceExtent(),loadProvenance(),loadHistoryCatalog()]);updateRouteDependentPanels();renderDataObservatory();setAnalysis('DATA REFRESH COMPLETE','ok')}
+function setDepartureNow(){const d=new Date(),off=d.getTimezoneOffset(),local=new Date(d.getTime()-off*60000).toISOString().slice(0,16);q('departureTime').value=local}
+async function boot(){
+  initTheme();syncFollowGpsButton();setDepartureNow();
+  const initial=(location.hash||'#homeSection').slice(1);showView(Object.keys(viewMeta).includes(initial)?initial:'homeSection',false);
+  ['vesselType','shipSpeed','departureTime','searchRadius','safetyBuffer'].forEach(id=>q(id)?.addEventListener('change',()=>{if(id==='searchRadius'&&state.origin)updateNearby();invalidateRoute(`${q(id)?.previousElementSibling?.textContent||id} changed`)}));
+  q('globalSearch')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();globalSearch()}});
+  await Promise.allSettled([loadLocations(),loadHealth(),loadIcebergs(),loadVessels(),loadIceExtent(),loadProvenance(),loadArchive(),loadHistoryCatalog(),loadAiStatus()]);
+  await initMap();populateIcebergDetailSelect();renderHomeStatus();renderDataObservatory();updateRouteDependentPanels();initSettings();drawRouteGraph();drawIceExtentGraph();
+}
+window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(Object.keys(viewMeta).includes(id))showView(id,false)});setInterval(()=>{if(location.hash==='#aiSection'||document.getElementById('aiSection')?.classList.contains('active'))refreshAiDecisionCenter(true)},30000);
+Object.assign(window,{activateNav,navigateTo,toggleTheme,refreshData,useGpsOnce,startGpsTracking,stopGpsTracking,followGpsNow,toggleFollowGps,confirmGpsAsOrigin,beginMapPick,setManualPoint,useSelectedVesselAsOrigin,computeRoutes,clearRoute,selectProfile,fitAllRoutes,resetAntarcticView,focusIceberg,focusVessel,renderIcebergTable,renderVesselTable,loadVessels,updateTimeHorizon,toggleLayer,expandGraph,retryMap,presetForecastPoint,sampleEnvironmentalForecast,loadSelectedIcebergDetails,runScenario,renderHistoricalReplay,loadHistoryCatalog,renderHistoryCatalog,viewHistoricalTrack,globalSearch,toggleAutoRefresh,setThemeFromSelect,loadAiStatus,loadAiDecision,loadAiAnomalies,refreshAiDecisionCenter});
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+Source URL: https://noaadata.apps.nsidc.org/NOAA/G02135/south/daily/geotiff/2026/09_Sep/S_20260924_concentration_v4.0.tif
+Downloaded At: 2026-09-25T17:12:25.467137+00:00
+Observed At: 2026-09-24T00:00:00+00:00
+Provider: NSIDC (G02135 Version 4)
+Variables: Sea Ice Concentration
+CRS: EPSG:3412

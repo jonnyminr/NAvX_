@@ -1,0 +1,5 @@
+Source URL: https://usicecenter.gov/File/DownloadCurrent?pId=134
+Downloaded At: 2026-09-01T19:06:13.628779
+Provider: USNIC
+Valid Records: 33
+CRS: EPSG:3412

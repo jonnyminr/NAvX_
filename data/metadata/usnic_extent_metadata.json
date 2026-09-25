@@ -1,0 +1,33 @@
+{
+  "source": "U.S. National Ice Center (USNIC)",
+  "product": "Antarctic Daily Ice Extents & 10-Year Climatology",
+  "reference_page": "https://usicecenter.gov/Products/AntarcTrendGraph",
+  "ingested_at": "2026-09-05T07:12:13.374394Z",
+  "files": {
+    "2026": {
+      "url": "https://usicecenter.gov/data/ANTARC_2026_daily_ice_extents.txt",
+      "file": "ANTARC_2026_daily_ice_extents.txt",
+      "records": 86,
+      "status": "SUCCESS"
+    },
+    "2025": {
+      "url": "https://usicecenter.gov/data/ANTARC_2025_daily_ice_extents.txt",
+      "file": "ANTARC_2025_daily_ice_extents.txt",
+      "records": 364,
+      "status": "SUCCESS"
+    },
+    "2024": {
+      "url": "https://usicecenter.gov/data/ANTARC_2024_daily_ice_extents.txt",
+      "file": "ANTARC_2024_daily_ice_extents.txt",
+      "records": 366,
+      "status": "SUCCESS"
+    },
+    "10yrclimo": {
+      "url": "https://usicecenter.gov/data/10yrclimo.csv",
+      "file": "10yrclimo.csv",
+      "records": 365,
+      "status": "SUCCESS"
+    }
+  },
+  "scientific_integrity_guarantee": "100% genuine USNIC records; no synthetic interpolation or altered values."
+}
